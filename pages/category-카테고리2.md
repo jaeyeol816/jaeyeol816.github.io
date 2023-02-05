@@ -1,5 +1,5 @@
 ---
-title: "deep_learning"
+title: "카테고리2"
 layout: archive
 permalink: categories/category2
 author_profile: true

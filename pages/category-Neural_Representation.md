@@ -1,12 +1,12 @@
 ---
-title: "카테고리2"
+title: "NeRF"
 layout: archive
-permalink: categories/category2
+permalink: categories/nerf
 author_profile: true
 sidebar_main: true
 ---
 
 ## 테스트
 
-{% assign posts = site.categories.category2 %}
+{% assign posts = site.categories.nerf %}
 {% for post in posts %} {% include archive-single2.html type=page.entries_layout %} {% endfor %}

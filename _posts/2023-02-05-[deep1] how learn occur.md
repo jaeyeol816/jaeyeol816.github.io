@@ -20,15 +20,15 @@ use_math: true
 2. 퍼셉트론 (Weight & Activation)  &#160;&#160; [👉바로가기](#2-퍼셉트론-weight--activation)
 3. 다중 퍼셉트론  &#160;&#160; [👉바로가기](#3-다중-퍼셉트론)
 4. Layer  &#160;&#160; [👉바로가기](#4-unit과-layer)
-5. 네트워크의 입력값과 출력값 예시  &#160;&#160; [👉바로가기](#5-네트워크의-입력값과-출력값-예시)
-6. 학습이란? Weight를 찾아가는 과정이다!
-7. 투과 시키기 (Forward-propagation)
-8. Loss와 Gradient
-9. Weight를 조정해 학습 시키기 (Back-propagation) 
-10. 정리하자면...
+5. 학습이란? Weight를 찾아가는 과정이다! [👉바로가기](#5-학습이란-weight를-조정해-가는-과정이다)
+6. 투과 시키기 (Forward-propagation)
+7. Loss와 Gradient
+8. Weight를 조정해 학습 시키기 (Back-propagation) 
+9. 정리하자면...
 
 
 <br>
+
 ## 1. '인공 신경망'과 '사람의 신경망'
 
 &#160;딥러닝 구조는 사람의 뇌 속의 신경 세포의 구조를 모델화 한 것이라고 합니다. 딥러닝 구조를 흔히 '인공 신경망(artifical neural network)' 라고도 하죠. <br>
@@ -47,9 +47,10 @@ use_math: true
 &#160; 딥러닝에서도 마찬가지입니다. 특정 행동을 하는 뉴런 하나하나가 서로 복잡하게 연결되어 있습니다. 마찬가지로 한 뉴런에서 계산된 출력값이 다른 뉴런의 입력값이 되죠. 여기서 세포, 즉 뉴런 하나가 어떤 역할을 하는지는 다음 파트에서 설명 하겠습니다.
 
 <br>
+
 ## 2. 퍼셉트론 (Weight & Activation)
 
-&#160;딥러닝 모델을 흔히 MLP (Multi Layer Perceptron) 이라고 합니다. 퍼셉트론이 여러 Layer로 이루어진 구조라고 해석할 수 있습니다. 딥러닝 모델에서 퍼셉트론은 한 뉴런에서의 연산을 담당합니다. 이에 대응하는 사람의 뉴런(신경세포)에서의 연산을 간단히 알아봅시다.
+&#160;딥러닝 모델을 흔히 MLP (Multi Layer Perceptron) 이라고 합니다. 퍼셉트론이 여러 층으로 이루어진 구조라고 해석할 수 있습니다. 딥러닝에서 퍼셉트론에 대응하는 사람의 뉴런(신경세포)에서의 연산을 간단히 알아봅시다.
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/deep1/Picture2.png"
         style=""> 
@@ -65,7 +66,7 @@ use_math: true
     (사진3) Perceptron의 개념적 이해
   </figcaption>
 </figure>
-&#160;퍼셉트론은 신경세포의 동작 과정을 통계학적으로 모델링한 알고리즘입니다. (사진3)을 보며 이해해 봅시다. 하나의 퍼셉트론은 여러 Input을 가질 수 있습니다. (사진3)에서 🍎, 🍏, 🍊는 들어오는 Input을 나타냅니다. 이러한 Input들에게 첫번째로 Weighted Sum(가중합)을 구하는 연산이 적용됩니다. 🍎(첫번째 input)에는 $ w_1 $, 🍏(두번째 input)에는 $ w_2 $, 🍊(세번째 input)에는 $ w_3 $ 이 곱해지게 되죠. <br>
+&#160;퍼셉트론은 신경세포의 동작 과정을 통계학적으로 모델링한 알고리즘입니다. (사진3)을 보며 이해해 봅시다. 하나의 퍼셉트론은 여러 Input을 가질 수 있습니다. (사진3)에서 🍎, 🍏, 🍊는 들어오는 Input을 나타냅니다. 이러한 Input들에게 첫번째로 Weighted Sum(가중합)을 구하는 연산이 적용됩니다. 🍎(첫번째 input)에는 $ w_1 $, 🍏(두번째 input)에는 $ w_2 $, 🍊(세번째 input)에는 $ w_3 $ 이 곱해진 후 서로 더해지게 되죠. <br>
 &#160;구해진 가중합을 $ Z $라고 합시다. 이후 Activation Function(활성 함수)를 거치게 되는데, $Z$값이 특정 Threshold(임계값) 이상이면 1이 출력되고, 이하이면 0을 출력하게 됩니다. <br>
 &#160;실제 딥러닝에서는 Activation Function으로 위와 같은 계단 함수 말고 Sigmoid Function, ReLU Function등이 쓰입니다. 다음 포스팅에서 소개해 드리도록 하죠.
 
@@ -73,8 +74,9 @@ use_math: true
 &#160;퍼셉트론 한 개를 거쳤을 때 일어나는 일은 이해를 하셨을 겁니다. 하나의 퍼셉트론만 보셨을 때는 Regression(회귀)를 한 후 임계치에 따라 판단을 하는 과정입니다. 하지만 퍼셉트론이 여러 개 모였을 때에는 놀라운 결과를 만들어 낼 수 있습니다. 다음 절을 참고해주세요!
 
 <br> 
+
 ## 3. 다중 퍼셉트론
-&#160;시간이 없으신 분들은 이번 절은 건너뛰어도 좋아요.<br>
+시간이 없으신 분들은 이번 절은 건너뛰어도 좋아요.<br>
 &#160;퍼셉트론을 하나만 사용했을 때는 좌표명면 상의 데이터를 직선으로밖에 분리하지 못합니다. 아래 그림(사진4)처럼 말이죠 (2차원 데이터의 선형 분리 예시).
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/deep1/Picture4.png"
@@ -108,6 +110,7 @@ use_math: true
 
 
 <br>
+
 ## 4. Unit과 Layer
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/deep1/Picture7.png"
@@ -142,11 +145,30 @@ use_math: true
 &#160;일반적으로 Layer의 개수를 셀 때 input layer의 개수는 포함시키지 않아요. 사실 input layer는 연산을 하는 것이 아니라 네트워크에 주어진 데이터 그 자체이기 때문이죠. 따라서 (사진7), (사진8)의 경우 Layer 개수는 5개라고 할 수 있습니다.
 
 <br> 
-## 5. 네트워크의 입력값과 출력값 예시
+## 5. 학습이란? Weight를 조정해 가는 과정이다!
+
+&#160;Neural Network를 하나의 "함수"라고 생각해 봅시다. 우리가 이 함수에 데이터를 입력하면, 함수는 예측값을 출력합니다. 이때 예측값을 정확하게, 즉 실제값과 비슷하게 출력하도록 만드는 것이 우리의 목표입니다.
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/Picture9.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진9) 학습이 반복됨에 따라 weight값들이 업데이트됨
+  </figcaption>
+</figure>
+&#160;지금까지 배웠듯이 정해진 구조의 Neural Network의 아웃풋을 결정하는 것은 각 Unit의 weight입니다. 따라서 '학습'이라는 것은 최적의 예측값을 만들도록 각 Unit의 weight들이 업데이트되는 과정입니다. 학습이 진행됨에 따라 weight는 점차 변화합니다. <br>
+> &#160;믈론 weight뿐 아니라 각 Unit에 linear function부분에 존재하는 bias도 업데이트 하지만, 이는 다음 포스팅에서 자세히 다뤄 보도록 하겠습니다. (이번 포스팅에서는 weight에 대해서만 언급하겠습니다)
+
+&#160;그렇다면 weight는 어떻게 업데이트 되는 것일까요? 매 반복 주기(Iteration)마다 input데이터에 대한 예측값이 출력되고, 예측값에 대한 오차(loss)를 계산한 후, 현재 weight들에 대한 loss의 "변화율"에 기반하여 weight들을 업데이트해나갑니다. 이러한 반복이 진행되면 진행될수록 weight들은 더 낮은 loss를 갖는 예측값을 출력하도록 변화하게 됩니다. 어렵게 느껴지시나요? 다음 절에서 설명이 이어집니다.
+
+&#160;Deep Learning이라는 용어의 뜻도 어렵게 이해할 필요가 없어요. "Deep" 하다는 것은 layer가 여러 겹 있다는 뜻이고, "Learning" 은 그 상태에서 각 layer의 weight를 업데이트해가며 학습을 한다는 것입니다!
+
+<br>
+
+## 6. 투과시키기 (Forward Propagation)
 
 
 
-
+<br><br><br>
 
 ## Reference
 [사진1(1)](http://news.heraldcorp.com/view.php?ud=20211103000987) <br>

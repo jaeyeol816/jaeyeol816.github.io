@@ -20,11 +20,10 @@ use_math: true
 2. 퍼셉트론 (Weight & Activation)  &#160;&#160; [👉바로가기](#2-퍼셉트론-weight--activation)
 3. 다중 퍼셉트론  &#160;&#160; [👉바로가기](#3-다중-퍼셉트론)
 4. Layer  &#160;&#160; [👉바로가기](#4-unit과-layer)
-5. 학습이란? Weight를 찾아가는 과정이다! [👉바로가기](#5-학습이란-weight를-조정해-가는-과정이다)
-6. 투과 시키기 (Forward-propagation)
-7. Loss와 Gradient
-8. Weight를 조정해 학습 시키기 (Back-propagation) 
-9. 정리하자면...
+5. 학습이란? Weight를 찾아가는 과정이다! &#160;&#160; [👉바로가기](#5-학습이란-weight를-조정해-가는-과정이다)
+6. Forward-propagation과 Loss &#160;&#160; [👉바로가기](#6-forward-propagation과-loss)
+7. Gradient와 Back-propagation &#160;&#160; [👉바로가기](#7-gradient와-back-propagation)
+8. 정리하자면...
 
 
 <br>
@@ -125,7 +124,7 @@ use_math: true
 **Layer**<br>
 &#160;이전 단원에서 다중 퍼셉트론을 설명할 때 NAND유닛과 OR유닛이 하나의 '층'을 이루어고, AND유닛이 하나의 '층'을 이루었습니다. 이러한 '층'을 '레이어(layer)'라는 용어로 부릅니다. 
 <figure style="display:block; text-align:center;">
-  <img src="/assets/images/deep1/Picture8.png"
+  <img src="/assets/images/deep1/Picture8.png" width="200px"
         style=""> 
   <figcaption style="text-align:center; font-size:13px; color:#808080">
     (사진8) Layer의 종류
@@ -134,7 +133,7 @@ use_math: true
 
 **Input Layer, Hidden Layer, Output Layer**<br>
 &#160;Layer는 크게 세 종류로 나눌 수 있습니다. '입력층(Input Layer)', '은닉층(Hidden Layer)', '출력층(Output Layer)'으로 말이죠. Input Layer는 네트워크에 들어오는 데이터 그 자체를 지칭합니다. <br>
-&#160;네트워크로 특정 사람의 '[눈 크기, 코 높이, 머리 색상]' 과 같은 정보가 들어오면 네트워크가 '호감' 또는 '비호감'을 판단한다고 칩히다. 이때 들어오는 데이터 자체 (예를 들어 [3cm, 1cm, 갈색])가 Input Layer를 의미합니다. 이때 데이터가 3개 원소로 이루어져 있으니 Input Layer의 Unit의 개수는 3개입니다. 최종적으로 '호감' 또는 '비호감'이라는 데이터가 출력되는 Layer을 Output Layer라고 합니다. Output Layer는 마지막 Layer가 되는 거죠. <br>
+&#160;네트워크로 특정 사람의 '[눈 크기, 코 높이, 머리 색상]' 과 같은 정보가 들어오면 네트워크가 '호감' 또는 '비호감'을 판단한다고 칩시다. 이때 들어오는 데이터 (예를 들어 [3cm, 1cm, 갈색])가 그 자체로써 Input Layer를 의미합니다. 이때 데이터가 3개 원소로 이루어져 있으니 Input Layer의 Unit의 개수는 3개입니다. 최종적으로 '호감' 또는 '비호감'이라는 데이터가 출력되는 Layer을 Output Layer라고 합니다. Output Layer는 마지막 Layer가 되는 거죠. <br>
 &#160;Input Layer도 아니고 Output Layer도 아닌 모든 Layer들을 'Hidden Layer'라고 합니다. 중간 Layer의 이름에 Hidden이라는 용어가 들어간 이유은 무엇일까요? Hidden Layer으로 입력되거나 Hidden Layer에서 출력되는 값은 사람의 입장에서 의미있게 해석되는 값이 아니기 때문에 '감춰졌다'라는 표현을 사용합니다. 이 값들이 최종 Output Layer의 결과물을 만드는데 영향은 주지만, 값 하나하나가 의미를 갖고 있지 않습니다.
 
 **Layer간 연결의 특징**<br>
@@ -144,7 +143,8 @@ use_math: true
 **Layer의 개수** <br>
 &#160;일반적으로 Layer의 개수를 셀 때 input layer의 개수는 포함시키지 않아요. 사실 input layer는 연산을 하는 것이 아니라 네트워크에 주어진 데이터 그 자체이기 때문이죠. 따라서 (사진7), (사진8)의 경우 Layer 개수는 5개라고 할 수 있습니다.
 
-<br> 
+<br><br>
+
 ## 5. 학습이란? Weight를 조정해 가는 과정이다!
 
 &#160;Neural Network를 하나의 "함수"라고 생각해 봅시다. 우리가 이 함수에 데이터를 입력하면, 함수는 예측값을 출력합니다. 이때 예측값을 정확하게, 즉 실제값과 비슷하게 출력하도록 만드는 것이 우리의 목표입니다.
@@ -155,16 +155,77 @@ use_math: true
     (사진9) 학습이 반복됨에 따라 weight값들이 업데이트됨
   </figcaption>
 </figure>
-&#160;지금까지 배웠듯이 정해진 구조의 Neural Network의 아웃풋을 결정하는 것은 각 Unit의 weight입니다. 따라서 '학습'이라는 것은 최적의 예측값을 만들도록 각 Unit의 weight들이 업데이트되는 과정입니다. 학습이 진행됨에 따라 weight는 점차 변화합니다. <br>
+&#160;데이터가 'layer를 통과하는 것'은 '각 unit에 있는 weight가 곱해진 후 activation function을 통과하는 것'과 마찬가지 입니다. 그러므로 정해진 구조의 Neural Network의 아웃풋을 결정하는 것은 각 Unit의 weight입니다. 따라서 '학습'이라는 것은 최적의 예측값을 만들도록 각 Unit의 weight들이 업데이트되는 과정입니다. 학습이 진행됨에 따라 weight는 점차 변화합니다. <br>
 > &#160;믈론 weight뿐 아니라 각 Unit에 linear function부분에 존재하는 bias도 업데이트 하지만, 이는 다음 포스팅에서 자세히 다뤄 보도록 하겠습니다. (이번 포스팅에서는 weight에 대해서만 언급하겠습니다)
 
-&#160;그렇다면 weight는 어떻게 업데이트 되는 것일까요? 매 반복 주기(Iteration)마다 input데이터에 대한 예측값이 출력되고, 예측값에 대한 오차(loss)를 계산한 후, 현재 weight들에 대한 loss의 "변화율"에 기반하여 weight들을 업데이트해나갑니다. 이러한 반복이 진행되면 진행될수록 weight들은 더 낮은 loss를 갖는 예측값을 출력하도록 변화하게 됩니다. 어렵게 느껴지시나요? 다음 절에서 설명이 이어집니다.
+&#160;그렇다면 weight는 어떻게 업데이트 되는 것일까요? 매 반복 주기(Iteration)마다 input데이터에 대한 예측값이 출력되고, 예측값에 대한 오차(loss)를 계산한 후, 현재 weight들에 대한 loss의 "변화율"에 기반하여 weight들을 업데이트해나갑니다. 이러한 반복이 진행되면 진행될수록 weight들은 더 낮은 loss를 갖는 예측값을 출력하도록 변화하게 됩니다. 어렵게 느껴지시나요? 이후 내용에서 설명이 이어집니다.
 
 &#160;Deep Learning이라는 용어의 뜻도 어렵게 이해할 필요가 없어요. "Deep" 하다는 것은 layer가 여러 겹 있다는 뜻이고, "Learning" 은 그 상태에서 각 layer의 weight를 업데이트해가며 학습을 한다는 것입니다!
 
 <br>
 
-## 6. 투과시키기 (Forward Propagation)
+## 6. Forward-propagation과 Loss
+
+&#160;[5단원](#5-학습이란-weight를-조정해-가는-과정이다)에서 딥러닝에서 '학습'이라는 것이 무엇인지 배웠습니다. 이번 단원부터 학습이 일어나는 과정을 한가지 예시와 함께 조금 더 자세히 살펴보도록 해요.
+
+&#160;연예인의 '키', '몸무게', '눈 크기', '코 높이' 를 갖고 '호감 여부'를 예측하는 모델을 만들고 싶습니다. 이 때 학습을 위한 데이터셋은 아래와 같이 주어졌습니다. 
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/Picture10.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진10) 데이터셋 예시
+  </figcaption>
+</figure>
+
+&#160;이 데이터에서 초록색 부분은 input입니다. &#160;Input값을 neural network에 넣으면 여러 Layer를 차례대로 통과하며, 마지막 Layer에서는 '호감일 확률'이라는 예측값 출력합니다. &#160; 그런 다음 우리는 이 예측값과 ground truth값 사이의 오차를 계산합니다. 이 과정을 'Forward Propagation'이라고 하죠.
+
+&#160;이 경우 input vector의 크기가 4이므로 input layer의 크기는 4입니다. 첫번째 hidden layer의 모든 unit으로 input vector가 들어가게 됩니다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/Picture11.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진11) 연예인A의 데이터가 첫번째 hidden layer까지 투과한 상황
+  </figcaption>
+</figure>
+
+&#160; 첫번째 hidden layer의 각 unit는 초기화된 weight가 다르기 때문에 저마다 다른 output을 출력합니다. 이 값들은 두번째 hidden layer의 모든 unit에 들어가게 됩니다.
+
+&#160;두번째 hidden layer의 unit들도 마찬가지로 저마다 첫 hidden layer의 output을 갖고 각자의 output 을 만들어 냅니다. 
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/Picture12.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진12) 연예인A의 데이터가 output layer까지 투과한 상황 (ground truth와 비교)
+  </figcaption>
+</figure>
+
+&#160;이러한 두번째 hidden layer의 output은 마지막 layer의 input이 되며, 마지막 layer는 최종적인 '호감도가 1일 확률'을 출력합니다.
+
+&#160;학습 데이터셋에 대해서 우리는 ground truth, 즉 정답을 알고 있습니다. 결국, 방금 설명된 forward propagation의 output이 정답과 얼마나 가까운지 측정할 수 있다는 뜻이기도 하죠.
+
+> &#160;참고. 이렇게 학습 데이터셋의 정답을 알고 있는 형태의 머신 러닝을 'Supervised Learning'이라고 합니다.
+
+&#160; forward propagation으로부터 출력된 값을 $ \hat{y} $ 이라고 하고, ground truth 값을 $ y $ 이라고 합시다. 이 때, 우리는 아래과 같은 공식으로 loss를 구합니다.
+
+
+$$ L(\hat{y}, y) = -(y\log(\hat{y}) + (1-y)\log(1-\hat{y})) $$
+
+&#160;위 수식을 살펴보면, ground truth($ y $)가 1인 데이터에 대해서는, 수식의 오른쪽 부분은 0이 되고 왼쪽 부분만 살아남게 되어 loss는 $ -\log(\hat{y}) $ 이 됩니다. 이때, 로그함수의 모양을 생각해 보면 $ \hat{y} $가 작을수록 loss는 커지게 됩니다. 즉 $ y $가 1일때는  $ \hat{y} $도 1에 가까워야 loss(오차)가 작아진다는 것을 잘 나타내므로 이 수식이 말이 되는 것을 확인할 수 있죠. $ y $가 0일 때를 생각해 봐도 이 수식의 타당성을 이해 할 수 있습니다.
+
+&#160;(사진12)를 봅시다. 연예인A 데이터를 neural network에 forward propagate시킨 모습입니다. Neural network는 0.873이라는 $ \hat{y} $ 값('호감'일 확률)을 출력했습니다. 연예인A는 '호감'에 속하므로 $ y $값은 1이며, 위 수식에 넣어 계산한 loss는 -0.059 가 됩니다. 나름 잘(?) 맞췄으므로 상당히 작은 loss가 계산된 것을 확인하실 수 있습니다.
+
+&#160;그렇다면 이렇게 forward-propagation을 통해 loss를 구하는 것과, weight를 업데이트하는 '학습'과는 어떤 관계가 있는 걸까요? [다음 단원](#7-gradient와-back-propagation)에서는 loss가 계산된 이후 어떻게 weight를 update되는 것인지 이해해 보도록 하겠습니다.
+
+<br><br>
+
+## 7. Gradient와 Back-propagation
+
+
+
+
 
 
 

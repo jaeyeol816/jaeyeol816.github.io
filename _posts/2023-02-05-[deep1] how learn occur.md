@@ -75,7 +75,7 @@ use_math: true
 <br> 
 
 ## 3. 다중 퍼셉트론
-시간이 없으신 분들은 이번 절은 건너뛰어도 좋아요.<br>
+시간이 없으신 분들은 이번 단원은 건너뛰어도 좋아요.<br>
 &#160;퍼셉트론을 하나만 사용했을 때는 좌표명면 상의 데이터를 직선으로밖에 분리하지 못합니다. 아래 그림(사진4)처럼 말이죠 (2차원 데이터의 선형 분리 예시).
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/deep1/Picture4.png"
@@ -118,7 +118,8 @@ use_math: true
     (사진7) Unit과 Layer
   </figcaption>
 </figure>
-**Unit**<br>
+
+**Unit** <br>
 &#160;이제 딥러닝에서 쓰이는 용어로 넘어가도록 합시다. 지금까지 '뉴런(neuron)', '퍼셉트론(perceptron)'이라고 불렀던 것을 딥러닝에서는 '노드(node)' 또는 '유닛(unit)'이라고 불러요. 저는 앞으로 유닛(unit)이라는 표현을 사용하도록 하겠습니다.
 
 **Layer**<br>
@@ -210,7 +211,6 @@ use_math: true
 
 &#160; forward propagation으로부터 출력된 값을 $ \hat{y} $ 이라고 하고, ground truth 값을 $ y $ 이라고 합시다. 이 때, 우리는 아래과 같은 공식으로 loss를 구합니다.
 
-
 $$ L(\hat{y}, y) = -(y\log(\hat{y}) + (1-y)\log(1-\hat{y})) $$
 
 &#160;위 수식을 살펴보면, ground truth($ y $)가 1인 데이터에 대해서는, 수식의 오른쪽 부분은 0이 되고 왼쪽 부분만 살아남게 되어 loss는 $ -\log(\hat{y}) $ 이 됩니다. 이때, 로그함수의 모양을 생각해 보면 $ \hat{y} $가 작을수록 loss는 커지게 됩니다. 즉 $ y $가 1일때는  $ \hat{y} $도 1에 가까워야 loss(오차)가 작아진다는 것을 잘 나타내므로 이 수식이 말이 되는 것을 확인할 수 있죠. $ y $가 0일 때를 생각해 봐도 이 수식의 타당성을 이해 할 수 있습니다.
@@ -222,6 +222,71 @@ $$ L(\hat{y}, y) = -(y\log(\hat{y}) + (1-y)\log(1-\hat{y})) $$
 <br><br>
 
 ## 7. Gradient와 Back-propagation
+
+&#160;[5단원](#5-학습이란-weight를-조정해-가는-과정이다)에서 딥러닝에서 '학습'이란 loss를 최소화 하기 위해 weight를 업데이트해 가는 과정이라고 배웠습니다. 그렇다면 weight는 어떻게 업데이트를 하는 것일까요? 이 방법을 배우기 위해서 우선 weight에 대한 loss의 그래프를 살펴볼 필요가 있습니다.
+
+**Convex Function**
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/Picture13.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진13) weight에 대한 loss의 그래프
+  </figcaption>
+</figure>
+
+&#160;볼록 함수(convex function)에 대해 들어 보셨나요? 우리가 가장 잘 convex function은 이차함수 입니다. 함수가 최솟값을 가지게 하는 특정 x값이 존재하는 것이 특징입니다.
+
+&#160;우리의 목표는 loss를 최소로 하는 weight를 찾는 것입니다. Weight에 대한 loss의 함수가 (사진13)과 같이 convex function이라고 해 봅시다.<br>
+&#160;그렇다면 (사진13)의 왼쪽 그림인 2차원 함수의 경우 loss값이 최소가 되도록 하는 weight값이 존재하게 되며, (사진13)의 오른쪽 그림인 3차원 함수의 경우 loss값이 최소가 되도록 하는 weight값 쌍이 존재하게 됩니다.
+
+**Optimization 과정**
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/Picture14.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진14) w값에 기울기를 뺌으로써 optimal point의 w값으로 이동하도록 하는 과정
+  </figcaption>
+</figure>
+
+
+&#160;그렇다면 loss가 최소가 되기 위해서는 weight를 어떻게 움직이는 것이 좋을까요? (사진14)의 왼쪽 2차원 그래프를 봅시다. $ w_1 $ 이 0일 때 loss가 최솟값이 되죠. $ w_1 $이 0보다 작은 상황이면, $ w_1 $ 값을 오른쪽(더 커지게)으로 업데이트하고 $ w_1 $ 이 0보다 큰 상황이라면 왼쪽으로(더 작아지게) 업데이트하면 되겠죠? 
+
+&#160;이것을 구현하려면 어떻게 하면 될까요? "기울기(의 상수곱)를 빼는 과정"을 통해 $ w_1 $ 값을 볼록점의 $ w_1 $ 값으로 모이게 할 수 있습니다. 왜 기울기를 빼는 것이 $ w_1 $ 을 볼록점의 $ w_1 $ 값(위 그림에서 0)으로 모이게 하는지 알아봅시다. <br>
+&#160;$ w_1 $ 값이 0보다 작다면, 양수를 더해야 0으로 모이게 할 수 있습니다. 이때 $ w_1 $ 에서 loss함수의 기울기가 음수이기 때문에 이 '음수 상태인 기울기'를 빼는 것이 양수를 더하는 것과 같은 효과를 얻습니다. 
+&#160;$ w_1 $ 값이 0보다 크다면, 양수를 빼야 0으로 모이게 할 수 있습니다. 이때 $ w_1 $ 에서 loss함수의 기울기가 양수기 때문에 이 기울기를 빼는 것으로 $ w_1 $ 값을 0(볼록점의 $ w_1 $ 값)으로 모이게 할 수 있습니다.
+
+&#160;이렇게 loss가 최소가 되도록 weight값을 옮겨 가는 과정을 "optimization" 이라고 하며, 그 때의 좌표를 "optimal point"라고 합니다.
+
+&#160;(사진14)의 왼쪽 그림은 neural network에서 weight가 하나일 때 loss의 그래프를 나타낸 것이라면, (사진14)의 오른쪽 그림은 weight가 두 개일 때 loss의 그래프를 나타낸 것입니다. 이 때 $ w_1 $ 도 optimal point으로 옮기고 $ w_2 $ 도 optimal point으로 옮길 필요성이 있습니다. $ w_1 $ 값도 기울기를 빼고 $ w_2 $ 도 마찬가지로 기울기를 빼는 과정을 통해 $ w_1 $ 와 $ w_2 $ 를 각각 optimal point으로 수렴시키면 됩니다.
+
+&#160;실제로 neural network에서의 weight의 개수는 한개도 아니고 두개도 아닙니다. 각 layer마다, 그리고 각 unit마다 여러 개의 weight가 존재하며, 때로는 수천개가 되기도 합니다. 2차원, 3차원의 그래프는 그릴 수 있지만 수천 차원의 그래프는 그릴 수 없습니다. 하지만 그 때도 이렇게 각 weight마다 "본인에 대한 loss의 변화율"을 뺌으로써 optimize를 수행할 수 있다는 것은 똑같이 적용됩니다.
+
+**Local Optima**
+
+&#160;'기울기를 빼는' optimization과정을 아무때나 할 수 없습니다. 우리가 처음에 전제로 했던 볼록함수(convex function)여야 한다는 것이 필요조건입니다. 이렇게 기울기를 빼가면서 optimization을 했더니 loss의 전체 최솟값이 아닌 부분 최솟값에 수렴하게 만들 위험도 있습니다. 아래 (사진15)처럼 말이죠. 이렇게 함수 전체 구간에서의 최솟값이 아닌 부분 구간에서의 최솟값으로 optimize되는 현상을 "local optima problem"이라고 합니다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/Picture15.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진15) Local Optimum과 Global Optimum
+  </figcaption>
+</figure>
+
+&#160;하지만 현재로써 걱정할 필요는 없습니다. weight의 개수가 많아지면 결국에는 convex point가 하나 존재하게 된다는 것이 알려져 있기 때문이죠.
+
+
+**Gradient Descent 그리고 Back-propagation**
+
+&#160;그렇다면 neural network의 각각의 weight에 대한 loss의 변화율은 어떻게 구하면 될까요? 
+
+&#160;Neural network의 구조부터 생각해 봅시다. weight는 layer의 unit마다 존재합니다. 이 상황에서 모든 layer의 weight들 각각을 "자기 자신에 대한 loss의 변화율"을 구해야 하는 것이 우리의 과제입니다. "특정 weight에 대한 loss의 변화율"을 이제부터 "gradient"라는 용어로 부르기로 하죠.
+
+&#160;각 weight의 gradient를 구하기 위해 우리는 마지막 layer의 weight부터 "역방향"으로 미분을 해 나갑니다. 핵심은 "합성함수의 미분" 입니다. (내용 추가 예정)
+
+&#160;[6단원](#6-forward-propagation과-loss)에서 등장했던 "forward propagation"은 맨 앞 layer부터 연산을 진행했다면, 변화율을 구하는 과정은 마지막 layer부터 진행되기 때문에 "back propagation"이라는 용어를 사용하고 있습니다.
 
 
 
@@ -237,3 +302,6 @@ $$ L(\hat{y}, y) = -(y\log(\hat{y}) + (1-y)\log(1-\hat{y})) $$
 [사진2](https://theory.labster.com/neurons/)<br>
 [사진7](https://www.freecodecamp.org/news/want-to-know-how-deep-learning-works-heres-a-quick-guide-for-everyone-1aedeca88076)<br>
 [사진8](https://www.datadriveninvestor.com/deep-learning-explained/)<br>
+[사진13(1)](https://ko.wikipedia.org/wiki/%EC%9D%B4%EC%B0%A8_%ED%95%A8%EC%88%98)<br>
+[사진13(2)](https://www.sfu.ca/~ssurjano/spheref.html)<br>
+[사진15](https://vitalflux.com/local-global-maxima-minima-explained-examples/)

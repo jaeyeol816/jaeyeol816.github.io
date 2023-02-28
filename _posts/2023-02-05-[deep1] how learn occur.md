@@ -13,7 +13,7 @@ use_math: true
 
 <br>
 
-## 목차
+# 목차
 
 순서대로 읽으시는 것을 추천드립니다!
 1. '인공 신경망'과 '신경망' &#160;&#160; [👉바로가기](#1-인공-신경망과-사람의-신경망)
@@ -23,12 +23,12 @@ use_math: true
 5. 학습이란? Weight를 찾아가는 과정이다! &#160;&#160; [👉바로가기](#5-학습이란-weight를-조정해-가는-과정이다)
 6. Forward-propagation과 Loss &#160;&#160; [👉바로가기](#6-forward-propagation과-loss)
 7. Gradient와 Back-propagation &#160;&#160; [👉바로가기](#7-gradient와-back-propagation)
-8. 정리하자면...
+8. 정리하자면... &#160;&#160; [👉바로가기](#8-정리하자면)
 
 
-<br>
+<br><br>
 
-## 1. '인공 신경망'과 '사람의 신경망'
+# 1. '인공 신경망'과 '사람의 신경망'
 
 &#160;딥러닝 구조는 사람의 뇌 속의 신경 세포의 구조를 모델화 한 것이라고 합니다. 딥러닝 구조를 흔히 '인공 신경망(artifical neural network)' 라고도 하죠. <br>
 &#160;그렇다면 둘은 어떤 공통점이 있는 것일까요? 아래 그림은 사람의 신경망과 딥러닝의 신경망을 나타낸 것입니다.
@@ -45,9 +45,9 @@ use_math: true
 &#160;사람의 신경세포(뉴런)는 복잡하게 서로 연결되어 있습니다. 사람한테 외부 자극(정보)이 들어오면 전기 신호로 변환된 후 전기 신호가 수많은 뉴런 사이를 이동하게 됩니다. 이때 한 뉴런에서 출력된 전기 신호는 다른 뉴런의 입력으로 들어가게 돼요. <br>
 &#160; 딥러닝에서도 마찬가지입니다. 특정 행동을 하는 뉴런 하나하나가 서로 복잡하게 연결되어 있습니다. 마찬가지로 한 뉴런에서 계산된 출력값이 다른 뉴런의 입력값이 되죠. 여기서 세포, 즉 뉴런 하나가 어떤 역할을 하는지는 다음 파트에서 설명 하겠습니다.
 
-<br>
+<br><br>
 
-## 2. 퍼셉트론 (Weight & Activation)
+# 2. 퍼셉트론 (Weight & Activation)
 
 &#160;딥러닝 모델을 흔히 MLP (Multi Layer Perceptron) 이라고 합니다. 퍼셉트론이 여러 층으로 이루어진 구조라고 해석할 수 있습니다. 딥러닝에서 퍼셉트론에 대응하는 사람의 뉴런(신경세포)에서의 연산을 간단히 알아봅시다.
 <figure style="display:block; text-align:center;">
@@ -72,9 +72,9 @@ use_math: true
 &#160;뉴런으로 들어온 정보가 종합(Linear Function 적용)된 후, 임계점 이상이면(Activation Function 적용) 1을 다음 뉴런으로 넘긴다는 점이 사람의 뉴런과 비슷하게 느껴지시지 않나요? <br>
 &#160;퍼셉트론 한 개를 거쳤을 때 일어나는 일은 이해를 하셨을 겁니다. 하나의 퍼셉트론만 보셨을 때는 Regression(회귀)를 한 후 임계치에 따라 판단을 하는 과정입니다. 하지만 퍼셉트론이 여러 개 모였을 때에는 놀라운 결과를 만들어 낼 수 있습니다. 다음 절을 참고해주세요!
 
-<br> 
+<br><br>
 
-## 3. 다중 퍼셉트론
+# 3. 다중 퍼셉트론
 시간이 없으신 분들은 이번 단원은 건너뛰어도 좋아요.<br>
 &#160;퍼셉트론을 하나만 사용했을 때는 좌표명면 상의 데이터를 직선으로밖에 분리하지 못합니다. 아래 그림(사진4)처럼 말이죠 (2차원 데이터의 선형 분리 예시).
 <figure style="display:block; text-align:center;">
@@ -108,9 +108,9 @@ use_math: true
 &#160;퍼셉트론 한 층만으로는 선형 문제밖에 풀지 못했지만, 두 층을 두었더니 더 복잡한 문제를 풀 수 있었습니다. 이처럼 여러 층의 퍼셉트론을 모아 하나의 모델을 구성한 것을 인공신경망(Artificial Neural Network)라고 합니다. 퍼셉트론이 신경세포를 본 뜬 것이니 '신경망(Neural Network)'이라는 단어를 선택한 것입니다.
 
 
-<br>
+<br><br>
 
-## 4. Unit과 Layer
+# 4. Unit과 Layer
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/deep1/Picture7.png"
         style=""> 
@@ -146,7 +146,7 @@ use_math: true
 
 <br><br>
 
-## 5. 학습이란? Weight를 조정해 가는 과정이다!
+# 5. 학습이란? Weight를 조정해 가는 과정이다!
 
 &#160;Neural Network를 하나의 "함수"라고 생각해 봅시다. 우리가 이 함수에 데이터를 입력하면, 함수는 예측값을 출력합니다. 이때 예측값을 정확하게, 즉 실제값과 비슷하게 출력하도록 만드는 것이 우리의 목표입니다.
 <figure style="display:block; text-align:center;">
@@ -163,9 +163,9 @@ use_math: true
 
 &#160;Deep Learning이라는 용어의 뜻도 어렵게 이해할 필요가 없어요. "Deep" 하다는 것은 layer가 여러 겹 있다는 뜻이고, "Learning" 은 그 상태에서 각 layer의 weight를 업데이트해가며 학습을 한다는 것입니다!
 
-<br>
+<br><br>
 
-## 6. Forward-propagation과 Loss
+# 6. Forward-propagation과 Loss
 
 &#160;[5단원](#5-학습이란-weight를-조정해-가는-과정이다)에서 딥러닝에서 '학습'이라는 것이 무엇인지 배웠습니다. 이번 단원부터 학습이 일어나는 과정을 한가지 예시와 함께 조금 더 자세히 살펴보도록 해요.
 
@@ -221,7 +221,7 @@ $$ L(\hat{y}, y) = -(y\log(\hat{y}) + (1-y)\log(1-\hat{y})) $$
 
 <br><br>
 
-## 7. Gradient와 Back-propagation
+# 7. Gradient와 Back-propagation
 
 &#160;[5단원](#5-학습이란-weight를-조정해-가는-과정이다)에서 딥러닝에서 '학습'이란 loss를 최소화 하기 위해 weight를 업데이트해 가는 과정이라고 배웠습니다. 그렇다면 weight는 어떻게 업데이트를 하는 것일까요? 이 방법을 배우기 위해서 우선 weight에 대한 loss의 그래프를 살펴볼 필요가 있습니다.
 
@@ -278,25 +278,66 @@ $$ L(\hat{y}, y) = -(y\log(\hat{y}) + (1-y)\log(1-\hat{y})) $$
 &#160;하지만 현재로써 걱정할 필요는 없습니다. weight의 개수가 많아지면 결국에는 convex point가 하나 존재하게 된다는 것이 알려져 있기 때문이죠.
 
 
-**Gradient Descent 그리고 Back-propagation**
+**Back-propagation (역전파)**
 
 &#160;그렇다면 neural network의 각각의 weight에 대한 loss의 변화율은 어떻게 구하면 될까요? 
 
 &#160;Neural network의 구조부터 생각해 봅시다. weight는 layer의 unit마다 존재합니다. 이 상황에서 모든 layer의 weight들 각각을 "자기 자신에 대한 loss의 변화율"을 구해야 하는 것이 우리의 과제입니다. "특정 weight에 대한 loss의 변화율"을 이제부터 "gradient"라는 용어로 부르기로 하죠.
 
-&#160;각 weight의 gradient를 구하기 위해 우리는 마지막 layer의 weight부터 "역방향"으로 미분을 해 나갑니다. 핵심은 "합성함수의 미분" 입니다. (내용 추가 예정)
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/Picture16.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진16) Back propagation의 이해
+  </figcaption>
+</figure>
+
+&#160;각 weight의 gradient를 구하기 위해 우리는 마지막 layer의 weight부터 "역방향"으로 미분을 해 나갑니다. 여기서 핵심은 "합성함수의 미분" 입니다. <br>
+&#160;(사진16)과 같은 neural network를 합성 함수라고 생각해봐요. 인풋 데이터를 주었을 때 주황색 unit 함수, 노란색 unit 함수, 초록색 unit 함수, 파란색 unit 함수 순서대로 거친 후 ground truth와 비교하는 함수를 거쳐 loss가 계산된다고 해 봅시다 (실제로는 색칠된 unit 뿐 아니라 모든 unit을 거치는데 이해를 위해 색칠한 unit에 대해서만 언급하겠습니다.) 
+
+&#160;첫 번째로, 합성함수에서 가장 마지막 함수라고 할 수 있는 loss function의 변화율을 구합니다. Loss function은 neural network의 output를 loss로 매핑하는 함수이며, 이 함수의 미분을 통해 "output에 대한 loss"의 변화율, 즉 $ dLoss \over dOutput $ 이라고 할 수 있습니다.
+
+&#160;그 다음 단계는, 파란색 unit의 weight인 $ w_🍎 $ 에 대한 loss의 변화율을 구하는 것이 목표입니다. 파란색 unit에 존재하는 linear함수와 activation함수는 미분이 가능하므로 $ dOutput \over dw_🍎 $ 는 충분히 한번에 구할 수 있습니다. 하지만 우리가 구하고 싶은 것은 $ dLoss \over dw_🍎 $ 입니다. 이것은 어떻게 구할 수 있을까요? 이전 단계(보라색)에서 구했던 $ dLoss \over dOutput $ 에다가 이번 단계(파란색)에서 구한 $ dOutput \over dw_🍎 $ 를 곱해주면 됩니다!! (합성함수의 미분)
+
+&#160; 다음 단계는, 초록색 unit의 weight인 $ w_🍊 $ 에 대한 loss의 변화율인 $ dLoss \over dw_🍊 $ 를 구하는 것입니다. 마찬가지로 합성함수 미분의 원리를 적용하면, 이전 단계에서 구한 $ dLoss \over dw_🍎 $ 에다가 현재 단계의 함수를 미분하여 구할 수 있는 $ dw_🍎 \over dw_🍊 $ 를 곱함으로써 $ dLoss \over dw_🍊 $ 를 계산할 수 있습니다. 이처럼 layer를 역방향으로 거슬러 올라가면서 이 함성함수 미분을 실시하면, 차례대로 모든 unit의 weight에 대한 loss의 변화율들을 구해 나갈 수 있습니다.
+
 
 &#160;[6단원](#6-forward-propagation과-loss)에서 등장했던 "forward propagation"은 맨 앞 layer부터 연산을 진행했다면, 변화율을 구하는 과정은 마지막 layer부터 진행되기 때문에 "back propagation"이라는 용어를 사용하고 있습니다.
 
+**Gradient Descent (경사하강법) 그리고 Parameter**
 
+&#160;위 내용에서 설명이 이어집니다. 이렇게 각 weight의 gradient를 구했으면, optimization을 하기 위해 기존 weight값에서 gradient를 빼 주면 됩니다. (왜 이런 과정을 거치는지는 위의 "**Optimization 과정**" 단원에서 설명하였습니다.)
 
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/Picture17.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진17) Gradient Descent
+  </figcaption>
+</figure>
 
+&#160;하지만 weight에서 gradient를 그냥 빼지는 않습니다. 우리의 목표는 optimal point에 weight가 수렴하게 만드는 것인데, gradient값이 크면 optimal point를 지나칠 수 있고, 작으면 너무 천천히 다가가게 될 수도 있기 때문입니다. 따라서 우리는 적절한 learning rate ((사진17)에서의 $ \alpha $) 를 gradient에 곱한 후 뺍니다. 
 
+&#160;이처럼 neural network상에 존재하는 다양한 weight들에 대해 gradient에 learning rate를 곱한 값을 빼 줌으로써 업데이트를 해나가는 과정을 gradient descent라고 합니다. 주의해야 할 것은, weight 뿐 아니라 각 unit에 존재하는 bias도 마찬가지로 똑같은 gradient descent 과정이 적용되어 업데이트되어갑니다. 이처럼 학습의 대상이 되는 변수들을 "parameter"이라고 합니다.
+
+&#160;이번 단원에서 배운 내용은 결국 "gradient descent를 수행함으로써 딥러닝 모델을 optimize한다" 라고 정리할 수 있어요.
+
+<br><br>
+
+# 8. 정리하자면..
+
+- 우리의 목표는 neural network가 정확한 예측값을 출력해 내도록 학습 시키는 것이며, '학습'은 neural network상에 존재하는 parameter를 업데이트함으로써 진행됩니다. 
+- 데이터셋을 neural network에 집어넣어 예측값을 얻고, ground truth와 예측값을 비교하여 loss를 얻는 과정을 forward-propagation이라고 합니다.
+- 각 parameter들에 대한 loss의 변화율인 gradient들을 구한 다음 parameter에 gradient에 learning rate를 곱한 값을 빼 parameter값을 업데이트합니다. 이것을 back-propagation이라고 합니다.
+- Forward-propagation, loss 계산, back-propagation을 모두 거치면 1회의 iteration이 일어났다고 할 수 있습니다.
+- Iteration 과정이 수천 번, 수만 번, 또는 그 이상으로 반복시켜 학습을 진행시킵니다. 점차 optimization이 진행되어 점점 loss가 작은 예측값을 출력하는 딥러닝 모델이 만들어집니다.
+
+> 이상으로 이번 포스팅을 마치겠습니다. 내용이 길었지만 끝까지 읽어주셔서 감사합니다^^
 
 
 <br><br><br>
 
-## Reference
+# Reference
 [사진1(1)](http://news.heraldcorp.com/view.php?ud=20211103000987) <br>
 [사진1(2)](https://www.freecodecamp.org/news/want-to-know-how-deep-learning-works-heres-a-quick-guide-for-everyone-1aedeca88076)<br>
 [사진2](https://theory.labster.com/neurons/)<br>

@@ -1,5 +1,5 @@
 ---
-title:  "[딥러닝1] 딥러닝에서 학습은 어떻게 일어날까?"
+title:  "[딥러닝1] 딥러닝에서 학습은 어떻게 일어날까? (딥러닝의 기본 원리)"
 categories:
   - deep_learning
 use_math: true

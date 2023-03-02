@@ -6,10 +6,10 @@ author_profile: true
 sidebar_main: true
 ---
 
-### 딥러닝
+### Deep Learning
 - [딥러닝 이론](/categories/deep_learning)
-- [ConvNet](/categories/conv_net)
+- [Convolution Network](/categories/conv_net)
 
-### Neural Representation
-- [NeRF](/categories/nerf)
+### Graphics
+- [Neural Representation](/categories/neural_representation)
 

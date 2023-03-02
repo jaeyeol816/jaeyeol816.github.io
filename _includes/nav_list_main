@@ -12,7 +12,7 @@
       </li>
       <li>
         <!--span 태그로 카테고리들을 크게 분류 ex) C/C++/C#-->
-        <span class="nav__sub-title">딥러닝</span>
+        <span class="nav__sub-title">Deep Learning</span>
             <!--ul 태그로 같은 카테고리들 모아둔 페이지들 나열-->
             <ul>
                 <!--Cpp 카테고리 글들을 모아둔 페이지인 /categories/cpp 주소의 글로 링크 연결-->
@@ -26,15 +26,15 @@
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "conv_net" %}
-                        <li><a href="/categories/conv_net" class="">Conv Net ({{category[1].size}})</a></li>
+                        <li><a href="/categories/conv_net" class="">Convolutional Network ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
-        <span class="nav__sub-title">Neural Representation</span>
+        <span class="nav__sub-title">Graphics</span>
             <ul>
                 {% for category in site.categories %}
-                    {% if category[0] == "nerf" %}
-                        <li><a href="/categories/nerf" class="">NeRF ({{category[1].size}})</a></li>
+                    {% if category[0] == "neural_representation" %}
+                        <li><a href="/categories/nueral_representation" class="">Neural Representation ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>

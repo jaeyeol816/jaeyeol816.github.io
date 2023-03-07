@@ -19,23 +19,22 @@ use_math: true
 
 서론
 1. Implicit Neural Representation &#160;&#160; [👉바로가기](#1-implicit-neural-representation)
-2. NeRF의 목적과 활용
-3. 3D particle과 Volume Rendering
+2. NeRF 개요 &#160;&#160; [👉바로가기](#2-nerf-개요)
 
-큰 그림
-4. NeRF Neural Network의 Input과 Output
-5. NeRF의 Training및 Infering 과정 요약
+얕게 이해해보기
+3. 3D particle과 Ray
+4. NeRF의 Training및 Infering 과정 요약
 
-깊숙한 내용
-6. Hierarchical Volume Sampling
-7. Positional Encoding
-8. NeRF Neural Network Structure
-9. NeRF Volume Rendering
-10. Loss Computation
+깊게 파헤치기
+5. Hierarchical Volume Sampling
+6. Positional Encoding
+7. NeRF Neural Network Structure
+8. NeRF Volume Rendering
+9. Loss Computation
 
 마무리
-11. 기존 모델과 비교
-12. 결론 및 개선점
+10. 기존 모델과 비교
+11. 결론 및 개선점
 
 
 <br><br>
@@ -83,12 +82,79 @@ use_math: true
 &#160;하지만, 기존 방식에 비해 데이터를 읽어오는 속도가 느리다는 단점이 있습니다. 매 좌표마다 neural network의 forward연산을 수행하여야만 output값(color등)을 얻을 수 있기 때문이죠.
 
 
-&#160;NeRF는 하나의 정적인 scene에 대해 implicit neural representation을 적용한 것입니다. 어떤 원리가 숨어 있는지 지금부터 같이 알아보도록 해요~
+&#160;NeRF(Neural Radiance Field)는 하나의 정적인 scene에 대해 implicit neural representation을 적용한 것입니다. NeRF가 무엇이고 어떤 원리가 숨어 있는지 지금부터 같이 알아보도록 해요.
+
+<br><br>
+
+## 2. NeRF 개요
+
+**NeRF란 무엇일까요?**
+
+&#160;NeRF는 3D 공간 내 입자들의 color값과 density값을 neural network의 파라미터로 표현하는 것입니다. 1단원에서 언급한 용어를 빌리자면, 3D 데이터를 explicit하게 voxel 또는 point cloud으로 나타내는 것이 아니라, 딥러닝을 통해 학습된 neural network 상에서 (implicit하게) 3D 데이터를 reconstruct하는 것이라고 볼 수 있죠. 
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture4.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진4) Input image를 통해 학습한 후, 새로운 view를 합성 가능
+  </figcaption>
+</figure>
+
+&#160;NeRF모델의 학습은 물체에 대해 다양한 각도에서 촬영된 사진을 가지고 일어납니다. 학습된 NeRF모델이 있다면 우리가 물체를 특정 시점에서 바라봤을 때 어떤 색상값이 보이는지 query할 수 있습니다. 쉽게 말해, 원하는 방향으로 물체를 바라봤을 때의 이미지를 render할 수 있다는 것이죠.
+
+&#160;결국 다양한 각도에서 촬영된 이미지를 갖고 NeRF를 학습시킨 후, 중간 각도에서 바래본 새로운 이미지를 만들어낼 수 있는 것이죠. <br>
+&#160;자세히 말하면, NeRF모델을 학습시키기 위해 우리가 필요로 하는 것은 (1) 특정 장면(scene)에 대해 같은 시간 다양한 각도에서 촬영한 2D 이미지들과 (2) 카메라 파라미터(카메라의 위치와 방향 및 초점거리 등의 정보) 입니다. 학습된 NeRF를 통해 알아낼 수 있는 정보는 (1) 3차원 장면 내 특정 입자의 color와 density , 그리고, 직선상의 입자들을 종합하여 계산해낼 수 있는 (2) 특정 viewing direction에서 render된 pixel의 색상 입니다.
+<br><br>
+
+**NeRF neural network의 input과 output**
+
+&#160;NeRF 딥레닝 네트워크의 input과 output을 알아봅시다. 정보를 알고싶은 한 3차원 좌표(3d coordinate)와 바라보는 방향(viewing direction)을 집어넣으면 해당 입자의 color와 density값을 얻을 수 있습니다. 
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture5.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진5) 특정 point가 viewing direction에 따라 다른 색상을 가질 수 있음
+  </figcaption>
+</figure>
+
+&#160;여기서 주목할 부분이 있습니다. NeRF에서는 같은 위치의 입자라도 **바라보는 방향**에 따라 다른 색상값을 출력한다는 것입니다! (사진5)는 같은 장면을 View1와 View2에서 바라본 모습을 각각 나타냅니다. 같은 위치의 입자더라도 View1과 View2에서 빛의 반사에 따라 다른 색상을 가집니다. NeRF에서는 viewing direction도 입력값으로 받음으로써 이러한 성질을 반영하기 때문에 더 정확한 이미지를 출력할 수 있습니다.
+<br><br>
+
+**NeRF의 활용**
+
+NeRF가 실제로 어떤 분야에서 어떻게 활용될 수 있을까요?
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture6.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진6) NeRF의 활용 가능성
+  </figcaption>
+</figure>
+
+◾️ **가상현실(VR)과 증강현실(AR)**:  NeRF를 통해 실사 기반의 고품질 3D 컨텐츠를 만들어낼 수 있습니다.
+
+◾️ **영화 및 게임 산업**:  현실 세계에 대한 3D 모델을 생성하기 때문에, 영화 및 게임 컨텐츠의 배경을 만드는데 도움이 될 수 있어요.
+
+◾️ **실내 인테리어**:  특정 공간을 NeRF모델로서 표현함으로써, 가구 배치나 실내 디자인을 설계하는데 도움이 될 수 있고, 부동산 거래시에도 참고될 수 있습니다.
+
+◾️ **의학**:  내시경 혹은 CT, MRI등을 통해 촬영된 이미지를 사용해 NeRF를 학습시킴으로써, 신체 내부의 모습에 대해 3D 모델링 할 수 있습니다. 수술 또는 의료 교육 등에 활용할 수 있어요.
+
+◾️ **자율주행 자동차 또는 로보틱스**:  NeRF를 통해 현실 세계에 대한 3D 모델을 생성하여 자율주행 시스템에게 제공함으로써, 더 정확하고 효율적인 경로 선택에 도움을 줄 수 있습니다.
+
+이처럼 NeRF는 다양한 곳에서 응용될 수 있습니다. 이제 NeRF기술을 이해해보고 싶은 마음이 충분히 생기셨을 것 같으니, 다음 단원부터 본격적으로 원리 설명을 시작하겠습니다.
 
 
 
 ## Reference
 [사진1](https://en.wikipedia.org/wiki/Mona_Lisa) <br>
-[사진2(1)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.ripemedia.com%2Fwhy-i-love-pixels-and-so-can-you%2F&psig=AOvVaw3tSX4600BrO4udfnrq6Cb5&ust=1678069785908000&source=images&cd=vfe&ved=0CBEQjhxqFwoTCPCg5Z3fw_0CFQAAAAAdAAAAABAT) <br>
-[사진2(2)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fdepositphotos.com%2Fstock-photos%2Fhouse-made-by-voxels.html&psig=AOvVaw0C3X5_XwUuZosPo935QErJ&ust=1678069944652000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCNjxuenfw_0CFQAAAAAdAAAAABAL) <br>
+[사진2(1)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.ripemedia.com%2Fwhy-i-love-pixels-and-so-can-you%2F&psig=AOvVaw3tSX4600BrO4udfnrq6Cb5&ust=1678069785908000&source=images&cd=vfe&ved=0CBEQjhxqFwoTCPCg5Z3fw_0CFQAAAAAdAAAAABAT) 
+[사진2(2)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fdepositphotos.com%2Fstock-photos%2Fhouse-made-by-voxels.html&psig=AOvVaw0C3X5_XwUuZosPo935QErJ&ust=1678069944652000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCNjxuenfw_0CFQAAAAAdAAAAABAL) 
 [사진2(3)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.mdpi.com%2F2079-9292%2F8%2F10%2F1196&psig=AOvVaw233Dr1LLY9R3Izot94AVN0&ust=1678070060769000&source=images&cd=vfe&ved=0CBEQjhxqFwoTCKDq36Dgw_0CFQAAAAAdAAAAABAf) <br>
+[사진4](https://arxiv.org/abs/2003.08934) <br>
+[사진5](https://arxiv.org/abs/2003.08934) <br>
+[사진6(1)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.techlearning.com%2Ffeatures%2Fwhat-is-virtual-reality&psig=AOvVaw2zcr4RVRzmst2j1VJZw9PJ&ust=1678247646885000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCPDYwuj1yP0CFQAAAAAdAAAAABAE)
+[사진6(2)](https://www.google.com/url?sa=i&url=https%3A%2F%2Ffree3d.com%2F3d-model%2Fhouse-interior--81890.html&psig=AOvVaw1c2zgIz_JEd7g8bCjCb41i&ust=1678247739118000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCJjg0JT2yP0CFQAAAAAdAAAAABAE)
+[사진6(3)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.auntminnie.com%2Findex.aspx%3Fsec%3Dlog%26itemID%3D131844&psig=AOvVaw018bA1EkkPFpd5GXi7fS8B&ust=1678248014509000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCJDQ4Jf3yP0CFQAAAAAdAAAAABAE)
+[사진6(4)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.sciencedirect.com%2Fscience%2Farticle%2Fpii%2FS2666691X22000136&psig=AOvVaw3suMsxwf7UhS4oApca8_Y-&ust=1678248121256000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCMDv3sr3yP0CFQAAAAAdAAAAABAE)

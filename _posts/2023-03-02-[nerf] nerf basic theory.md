@@ -21,11 +21,11 @@ use_math: true
 1. Implicit Neural Representation &#160;&#160; [👉바로가기](#1-implicit-neural-representation)
 2. NeRF 개요 &#160;&#160; [👉바로가기](#2-nerf-개요)
 
-얕게 이해해보기
-3. 3D particle과 Ray
+본론1 (큰 그림 이해하기)
+3. Ray와 Volume Rendering  &#160;&#160; [👉바로가기](#3-ray와-volume-rendering)
 4. NeRF의 Training및 Infering 과정 요약
 
-깊게 파헤치기
+본론2 (자세히 알아보기)
 5. Hierarchical Volume Sampling
 6. Positional Encoding
 7. NeRF Neural Network Structure
@@ -39,7 +39,7 @@ use_math: true
 
 <br><br>
 
-# 서론
+# I. 서론
 
 ## 1. Implicit Neural Representation
 
@@ -146,6 +146,44 @@ NeRF가 실제로 어떤 분야에서 어떻게 활용될 수 있을까요?
 이처럼 NeRF는 다양한 곳에서 응용될 수 있습니다. 이제 NeRF기술을 이해해보고 싶은 마음이 충분히 생기셨을 것 같으니, 다음 단원부터 본격적으로 원리 설명을 시작하겠습니다.
 
 
+<br><br>
+
+# II. 본론1
+- <본론1>에서는, NeRF의 모든 내용을 자세히 알아보기 전 큰 그림을 전체적으로 이해해보는 시간을 가져보겠습니다.
+
+## 3. Ray와 Volume Rendering
+
+&#160;NeRF의 neural network으로부터 우리가 원하는 시점(view)에서의 이미지를 렌더링(rendering)하고 싶다고 해 봅시다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture7.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진7) 렌더링되는 이미지와 Ray
+  </figcaption>
+</figure>
+
+&#160;NeRF의 neural network는 3D 공간 상의 입자(3D particle)들의 정보를 담고 있습니다. NeRF에게 3D 공간상의 특정 점의 좌표 및 바라보는 방향을 input으로 주면 NeRF는 해당 3D particle의 색상과 밀도 정보를 출력합니다. <br>
+&#160;하지만 우리가 원하는 것은 3D 입자 하나하나의 값이 아니라, 우리가 바라보는 시점(view)에서의 이미지일 뿐이죠. 따라서 이미지를 구성하는 모든 픽셀들의 색상값(RGB)을 계산해야 하죠. 각 픽셀의 색상값은, 해당 픽셀로부터 직선을 그어 그 직선을 구성하는 particle들의 정보를 통해 계산합니다. 이 때 사용되는 직선을 'ray'라고 합니다. <br>
+&#160;결국, rendering 되는 픽셀 값은 그 픽셀에서부터 viewing direction방향으로 진행되는 ray상에 있는 모든 particle들의 색상, 밀도값을 종합하여 계산됩니다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture8.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진8) Overview of Volume Rendering 
+  </figcaption>
+</figure>
+
+&#160;NeRF에서는 volume rendering을 통해 3차원 공간의 ray상의 점들을 적분하여 2차원상의 픽셀의 색상을 결정합니다. (이때 주의할 것은, 현실적으로 연속적인 모든 점을 적분할 수 없으므로, ray상의 일부 particle들을 샘플링 하여 더한다는 것입니다.) 투과된 픽셀의 색상을 알기 위해서는 R, G, B 각각 ray상의 particle들의 색상을 더하여 얻을 수 있습니다. 이 때, density가 높은 particle은 더 많은 비중을 두고 density가 낮은 particle들은 더 낮은 비중을 주어 더하죠. 이 뿐만 아닙니다. 특정 particle 앞에 많은 particle이 가로막고 있다면 렌더링 했을 때의 해당 particle의 영향력은 감소할 수 밖에 없습니다. 따라서 픽셀 앞에 있는 particle들의 density들을 종합하여 '누적된 투과율' 이라는 것을 추가적으로 곱해 줍니다. 
+
+&#160;지금까지 ray의 volume rendering을 통해 렌더링된 이미지 내 픽셀 하나 하나의 색상값을 계산해내는 대략적인 과정을 알아보았습니다. 수식을 비롯한 더 자세한 내용은 hierarchical volume sampling을 배운 후 [8단원]() 에서 이어서 설명드리도록 하겠습니다.
+
+
+
+
+
+
 
 ## Reference
 [사진1](https://en.wikipedia.org/wiki/Mona_Lisa) <br>
@@ -158,3 +196,5 @@ NeRF가 실제로 어떤 분야에서 어떻게 활용될 수 있을까요?
 [사진6(2)](https://www.google.com/url?sa=i&url=https%3A%2F%2Ffree3d.com%2F3d-model%2Fhouse-interior--81890.html&psig=AOvVaw1c2zgIz_JEd7g8bCjCb41i&ust=1678247739118000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCJjg0JT2yP0CFQAAAAAdAAAAABAE)
 [사진6(3)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.auntminnie.com%2Findex.aspx%3Fsec%3Dlog%26itemID%3D131844&psig=AOvVaw018bA1EkkPFpd5GXi7fS8B&ust=1678248014509000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCJDQ4Jf3yP0CFQAAAAAdAAAAABAE)
 [사진6(4)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.sciencedirect.com%2Fscience%2Farticle%2Fpii%2FS2666691X22000136&psig=AOvVaw3suMsxwf7UhS4oApca8_Y-&ust=1678248121256000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCMDv3sr3yP0CFQAAAAAdAAAAABAE)
+[사진7](https://www.matthewtancik.com/nerf)
+

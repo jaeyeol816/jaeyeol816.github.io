@@ -22,13 +22,13 @@ use_math: true
 2. NeRF 개요 &#160;&#160; [👉바로가기](#2-nerf-개요)
 
 본론1 (큰 그림 이해하기)
-3. Ray와 Volume Rendering  &#160;&#160; [👉바로가기](#3-ray와-volume-rendering)
-4. NeRF의 Training및 Infering 과정 요약
+3. Ray와 Volume Rendering 개요  &#160;&#160; [👉바로가기](#3-ray와-volume-rendering-개요)
+4. NeRF의 Training및 Infering 과정 요약  &#160;&#160; [👉바로가기](#4-nerf-학습-과정-정리)
 
 본론2 (자세히 알아보기)
 5. Hierarchical Volume Sampling
 6. Positional Encoding
-7. NeRF Neural Network Structure
+7. NeRF MLP Structure
 8. NeRF Volume Rendering
 9. Loss Computation
 
@@ -149,11 +149,11 @@ NeRF가 실제로 어떤 분야에서 어떻게 활용될 수 있을까요?
 <br><br>
 
 # II. 본론1
-- <본론1>에서는, NeRF의 모든 내용을 자세히 알아보기 전 큰 그림을 전체적으로 이해해보는 시간을 가져보겠습니다.
+- <본론1>에서는, NeRF의 모든 내용을 자세히 알아보기 전 큰 그림을 전체적으로 이해해보는 시간을 가져보겠습니다. <br>
 
-## 3. Ray와 Volume Rendering
+## 3. Ray와 Volume Rendering 개요
 
-&#160;NeRF의 neural network으로부터 우리가 원하는 시점(view)에서의 이미지를 렌더링(rendering)하고 싶다고 해 봅시다.
+&#160;어떻게 NeRF의 MLP으로부터 우리가 원하는 시점(view)에서의 이미지를 렌더링(rendering)할 수 있을지 알아봅시다.
 
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/nr1/Picture7.png"
@@ -163,9 +163,9 @@ NeRF가 실제로 어떤 분야에서 어떻게 활용될 수 있을까요?
   </figcaption>
 </figure>
 
-&#160;NeRF의 neural network는 3D 공간 상의 입자(3D particle)들의 정보를 담고 있습니다. NeRF에게 3D 공간상의 특정 점의 좌표 및 바라보는 방향을 input으로 주면 NeRF는 해당 3D particle의 색상과 밀도 정보를 출력합니다. <br>
-&#160;하지만 우리가 원하는 것은 3D 입자 하나하나의 값이 아니라, 우리가 바라보는 시점(view)에서의 이미지일 뿐이죠. 따라서 이미지를 구성하는 모든 픽셀들의 색상값(RGB)을 계산해야 하죠. 각 픽셀의 색상값은, 해당 픽셀로부터 직선을 그어 그 직선을 구성하는 particle들의 정보를 통해 계산합니다. 이 때 사용되는 직선을 'ray'라고 합니다. <br>
-&#160;결국, rendering 되는 픽셀 값은 그 픽셀에서부터 viewing direction방향으로 진행되는 ray상에 있는 모든 particle들의 색상, 밀도값을 종합하여 계산됩니다.
+&#160;NeRF의 MLP는 3D 공간 상의 입자(3D particle)들의 정보를 담고 있습니다. NeRF에게 3D 공간상의 특정 점의 좌표 및 바라보는 방향을 input으로 주면 NeRF는 해당 3D particle의 색상과 밀도 정보를 출력합니다. <br>
+&#160;하지만 우리가 원하는 것은 3D 입자 하나하나의 값이 아니라 바라보는 시점(view)에서의 이미지이기 때문에, 이미지를 구성하는 모든 픽셀들의 색상값(RGB)을 계산해야 하죠. 각 픽셀의 색상값은, 해당 픽셀로부터 직선을 그어 그 직선을 구성하는 particle들의 정보를 통해 계산합니다. 이 때 사용되는 직선을 'ray'라고 합니다. <br>
+&#160;요약하자면, rendering 되는 픽셀 값은 그 픽셀에서부터 viewing direction방향으로 진행되는 ray상에 있는 모든 particle들의 색상, 밀도값을 종합하여 계산됩니다.
 
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/nr1/Picture8.png"
@@ -179,8 +179,103 @@ NeRF가 실제로 어떤 분야에서 어떻게 활용될 수 있을까요?
 
 &#160;지금까지 ray의 volume rendering을 통해 렌더링된 이미지 내 픽셀 하나 하나의 색상값을 계산해내는 대략적인 과정을 알아보았습니다. 수식을 비롯한 더 자세한 내용은 hierarchical volume sampling을 배운 후 [8단원]() 에서 이어서 설명드리도록 하겠습니다.
 
+<br><br>
+
+## 4. NeRF 학습 과정 정리
+
+&#160;이번 단원에서는 NeRF 모델을 학습시키는 단계들에 대해 대략적으로 설명한 후, 다음 단원에서부터 각 단계에 대해 자세히 알아보도록 하겠습니다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture9.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진9) NeRF 모델의 training 과정
+  </figcaption>
+</figure>
+
+**1단계. 샘플 이미지 기반으로 ray 구성하기**
+
+&#160;학습 데이터로 제공된 이미지들의 모든 픽셀 집합 중 특정 픽셀을 선택하고, 그 픽셀로부터 scene 방향으로 출발하는 ray를 $ r(t) = o + td $ 로 구성합니다.
+
+**2단계. Ray상에서 point들을 샘플링하기**
+
+&#160;ray상의 near bound와 far bound 범위 사이에서 $ N $ 개의 point를 샘플링 합니다. (사실 ray 전체에 걸쳐 샘플링 된 후 물체가 있는 부분에 대해 집중적으로 한번 더 샘플링 합니다. 자세한 설명은 [5단원]()을 참고해주세요.)
+
+**3단계. 샘플링된 모든 점에 대해 각각 MLP에 query하기**
+
+&#160;샘플링된 $ N $개의 point들 각각을 MLP에 input값으로 대입합니다. MLP로부터 각 point들의 color와 density값을 얻습니다.
+
+**4단계. Volume rendering을 통해 예측된 색상값 계산하기**
+
+&#160;Ray의 각 point별 color, density값을 가지고 고유의 색상값을 계산해 냅니다. 이 값은 ray에 대한 MLP의 예측값입니다. (자세한 설명은 [8단원]()을 참고해주세요.) Volume rendering 과정은 미분가능하기 때문에 loss에 대한 gradient를 계산하는데 방해가 되지 않습니다. 
+
+**5단계. Loss 계산하기**
+
+&#160;4단계에서 구한 예측값과 샘플 이미지의 실제 색상값(ground truth) 사이의 오차(loss)를 구합니다. Loss로는 squared error를 사용합니다. (자세한 설명은 [9단원]()을 참고해주세요.)
+
+**6단계. Back-propagation**
+
+&#160;MLP 내 각 파라미터당 loss의 변화율(gradient)을 계산한 후 gradient descent를 실시하여 optimize를 해나갑니다. 1~6단계가 iteration 횟수만큼 반복됩니다.
 
 
+
+<br><br>
+
+# III. 본론2
+- <본론2>에서는, NeRF의 학습 중 수행되는 세부 과정들에 대해 자세히 알아보도록 하겠습니다.
+
+
+## 5. Hierarchical Volume Sampling
+
+&#160;[4단원](#4-nerf-학습-과정-정리)의 2단계에서 소개된, 학습시 input으로 사용할 point들을 샘플링하는 과정에 대한 설명입니다. <br>
+&#160;NeRF에서 적절한 샘플링 포인트를 선택하는 것은 중요합니다. 너무 많은 point들을 선택하면 계산 비용이 많이 들기에 실제로 물체가 존재하는(즉, 더 많은 정보를 표현하고 있는) point들을 집중적으로 선택하는 것이 더 효율적이죠. 따라서 NeRF에서는 성능을 향상시키기 위해 point들을 샘플링 할 때 ray 전체에 걸쳐 고르게 sampling하는 것이 아니라 밀도가 높은 영역에서 더 많이 샘플링 하는 Hierarchical volume sampling이 이루어집니다. <br>
+&#160;Hierarchical volume sampling은 전체 ray에서 균등하게 샘플링된 점으로 먼저 예측 색상을 계산하고(coarse network), 이 중에서 밀도 가 높은 점들을 집중적으로 샘플링하여 최종 예측 색상을 계산하는 과정(fine network) 입니다. <br>
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture10.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진10) Hierarchical volume sampling
+  </figcaption>
+</figure>
+
+**Hierarchical volume sampling 수행 과정**
+
+Hierarchical volume sampling의 과정은 다음과 같습니다. $ N_c $(coarse network 의 샘플링할 point의 수) 와 $ N_f $(fine network를 위해 샘플링할 point의 수) 는 hyperparameter이며, 논문에서는 $ N_c = 64, N_f = 128 $ 을 채택하였습니다.
+
+**(1)** Ray를 $ N_c $ 개의 구역으로 나누고, 각 구역에서 point를 하나씩 선택합니다. (Startified sampling)
+
+**(2)** 이 $ N_c $ 개의 point들을 MLP에 집어넣어 $ N_c $ 개의 color, density 아웃풋을 얻고, 이를 종합하여 ray의 예측 색상 $ \hat{C}_c(r) $ 을 계산합니다. 아래 첨자 $ c $ 는 coarse network의 color 예측값임을 의미합니다.
+
+$$ \hat{C}_c(r) = \sum\limits_{i=1}^{N_c}{w_i c_i} \quad , \quad  w_i = T_i(1 - exp(-\sigma_i \delta_i)) $$
+
+위 수식은 coarse network의 color를 계산하는 수식입니다(volume sampling 이용). 수식은 ray를 $ i $개의 구간으로 나누어 구간당 point를 하나씩 할당하고, $ i $ 개의 point에 대한 color $ c_i $ 와 weight $ w_i $ 를 곱하여 가중치합을 구한 것을 의미합니다. 이 수식에서 weight $ w_i $ 는 해당 point가 ray상에서 얼마나 영향력을 갖는지를 의미합니다. 그 point의 density인 $ \delta_i $ 가 높을수록 $ w_i $ 값이 커짐을 알 수 있습니다.
+
+**(3)** 각 particle의 weight값들을 아래와 같은 수식을 통해 normalize합니다. Normalize 결과, 모든 weight의 합은 1이 됩니다. 따라서 각 weight ($ w_i $)를 해당 point $ i $ 에 대응하는 확률로 생각할 수 있습니다.
+
+$$ \hat{w}_i = {w_i \over \sum\limits_{j=1}^{N_c}{w_j}} $$
+
+**(4)** 확률분포에 따라 ray상에서  $ N_f $ 개의 점을 추가적으로 샘플링합니다. 이 때 밀도가 높은 point들, 즉, 물체가 있는 공간의 point들이 주로 샘플링됩니다.
+
+**(5)** 최종적으로 $ N_c + N_f $ 개의 point를 모두 fine network에 입력하여 각 point의 color & density를 얻은 후, volume rendering을 사용하여 최종적인 color 예측값을 산출합니다.
+<br><br>
+
+**Sampling 알고리즘: Inverse Transform Sampling**
+
+&#160;확률변수가 ray상의 point이고 (확률값이 weight인) 확률밀도함수(PDF)가 주어졌다고 했을 때, 위에 설명된 weight들의 확률분포에 따라 임의의 point들을 선택하고 싶은 상황입니다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture11.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진11) Inverse Transform Sampling
+  </figcaption>
+</figure>
+
+&#160;이때 PDF를 적분하여, 확률변수가 특정 값 이하가 될 확률분포를 나타내는 CDF(Cumulative distribution function) 를 구할 수 있습니다. 이 때 CDF의 함숫값은 \[0,1\] 범위에서 균일 분포(uniform distribution)를 갖습니다. 여기서 CDF의 함숫값을 난수에 따라 샘플링하고 이에 대응하는 x값을 선택하면, (즉, CDF의 역함수에서 \[0,1\] 사이의 특정 확률 분포를 따르는 x값에 대응하는 함숫값을 선택하면,) x값을 '처음 x의 확률분포에 따라서' 샘플링한 값이 됩니다. 이는 "연속적인 $ X $에 대한 CDF $ Y=F(X) $ 에 대해 Y는 균일 분포를 따른다"는 성질 때문입니다.
+&#160;이 과정을 inverse transform sampling이라고 하고, 더 알아보고 싶으면 [위키피디아](https://en.wikipedia.org/wiki/Inverse_transform_sampling)를 참고해 주세요.
+
+&#160;이처럼 Inverse transform sampling을 사용하면 주어진 화률 분포에서 난수를 생성할 수 있고, 결과적으로 coarse network에서 구한 밀도 분포에 따라 fine network의 입력 point들을 비례적으로 샘플링 할 수 있습니다. 즉, 더 밀도가 높아 더 영향을 많이 주는 point들을 더 많이 샘플링 할 수 있다는 것입니다.
 
 
 
@@ -195,6 +290,8 @@ NeRF가 실제로 어떤 분야에서 어떻게 활용될 수 있을까요?
 [사진6(1)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.techlearning.com%2Ffeatures%2Fwhat-is-virtual-reality&psig=AOvVaw2zcr4RVRzmst2j1VJZw9PJ&ust=1678247646885000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCPDYwuj1yP0CFQAAAAAdAAAAABAE)
 [사진6(2)](https://www.google.com/url?sa=i&url=https%3A%2F%2Ffree3d.com%2F3d-model%2Fhouse-interior--81890.html&psig=AOvVaw1c2zgIz_JEd7g8bCjCb41i&ust=1678247739118000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCJjg0JT2yP0CFQAAAAAdAAAAABAE)
 [사진6(3)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.auntminnie.com%2Findex.aspx%3Fsec%3Dlog%26itemID%3D131844&psig=AOvVaw018bA1EkkPFpd5GXi7fS8B&ust=1678248014509000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCJDQ4Jf3yP0CFQAAAAAdAAAAABAE)
-[사진6(4)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.sciencedirect.com%2Fscience%2Farticle%2Fpii%2FS2666691X22000136&psig=AOvVaw3suMsxwf7UhS4oApca8_Y-&ust=1678248121256000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCMDv3sr3yP0CFQAAAAAdAAAAABAE)
-[사진7](https://www.matthewtancik.com/nerf)
-
+[사진6(4)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.sciencedirect.com%2Fscience%2Farticle%2Fpii%2FS2666691X22000136&psig=AOvVaw3suMsxwf7UhS4oApca8_Y-&ust=1678248121256000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCMDv3sr3yP0CFQAAAAAdAAAAABAE) <br>
+[사진7](https://www.matthewtancik.com/nerf) <br>
+[사진9](https://arxiv.org/abs/2003.08934) <br>
+[사진10](DNeRF논문) <br>
+[사진11](https://youtu.be/FSG5bCkNWWo) <br>

@@ -272,13 +272,44 @@ $$ \hat{w}_i = {w_i \over \sum\limits_{j=1}^{N_c}{w_j}} $$
   </figcaption>
 </figure>
 
-&#160;이때 PDF를 적분하여, 확률변수가 특정 값 이하가 될 확률분포를 나타내는 CDF(Cumulative distribution function) 를 구할 수 있습니다. 이 때 CDF의 함숫값은 \[0,1\] 범위에서 균일 분포(uniform distribution)를 갖습니다. 여기서 CDF의 함숫값을 난수에 따라 샘플링하고 이에 대응하는 x값을 선택하면, (즉, CDF의 역함수에서 \[0,1\] 사이의 특정 확률 분포를 따르는 x값에 대응하는 함숫값을 선택하면,) x값을 '처음 x의 확률분포에 따라서' 샘플링한 값이 됩니다. 이는 "연속적인 $ X $에 대한 CDF $ Y=F(X) $ 에 대해 Y는 균일 분포를 따른다"는 성질 때문입니다.
+&#160;이때 PDF를 적분하여, 확률변수가 특정 값 이하가 될 확률분포를 나타내는 CDF(Cumulative distribution function) 를 구할 수 있습니다. 이 때 CDF의 함숫값은 \[0,1\] 범위에서 균일 분포(uniform distribution)를 갖습니다. 여기서 CDF의 함숫값을 난수에 따라 샘플링하고 이에 대응하는 x값을 선택하면, (즉, CDF의 역함수에서 \[0,1\] 사이의 특정 확률 분포를 따르는 x값에 대응하는 함숫값을 선택하면,) x값을 '처음 x의 확률분포에 따라서' 샘플링한 값이 됩니다. 이는 "연속적인 $ X $에 대한 CDF $ Y=F(X) $ 에 대해 $ Y $는 균일 분포를 따른다"는 성질 때문입니다.
 &#160;이 과정을 inverse transform sampling이라고 하고, 더 알아보고 싶으면 [위키피디아](https://en.wikipedia.org/wiki/Inverse_transform_sampling)를 참고해 주세요.
 
 &#160;이처럼 Inverse transform sampling을 사용하면 주어진 화률 분포에서 난수를 생성할 수 있고, 결과적으로 coarse network에서 구한 밀도 분포에 따라 fine network의 입력 point들을 비례적으로 샘플링 할 수 있습니다. 즉, 더 밀도가 높아 더 영향을 많이 주는 point들을 더 많이 샘플링 할 수 있다는 것입니다.
 
+<br>
+
+## 6. Positional Encoding
+
+&#160;NeRF의 neural network에 점의 위치($ x, y, z $)와 바라보는 각도($ θ, φ $)을 단순히 그냥 입력하는 것이 아니라 positional encoding 을 적용시켜 더 고차원의 벡터로 변화시켜 입력합니다. Positional encoding을 적용하는 이유는 MLP가 더 정밀하고 복잡한 고주파의 (high frequency) 정보를 표현하기 위해서 입니다. 이것이 어떤 의미인지 알기 위해 아래 사진을 바라봅시다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture12.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진12) positional encoding 미사용시 / 사용시
+  </figcaption>
+</figure>
+
+&#160;(사진12)의 오른쪽 그림은 왼쪽 그림에 비해 사자의 모습이 더 선명하게 나타납니다. 따라서 오른쪽 그림을 표현하는 neural network가 positional encoding을 적용하였기 때문에 고주파의 정보를 더 담고 있다고 할 수 있죠. 
+
+&#160;[Rahaman et al 의 논문](http://proceedings.mlr.press/v97/rahaman19a/rahaman19a.pdf)에 따르면, deep neural network가 저주파 성분에 편향적으로 학습되는 경향이 있다고 합니다. 이를 극복하여 고주파의 정보를 담기 위해, NeRF에서는 MLP에 input으로 대입하는 정보(좌표, 방향)를 더 고차원의 벡터로 변환시켜 대입합니다. 
+
+&#160;NeRF의 positional encoding 수식은 아래와 같습니다.
+
+$$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p), \,...\,, sin(2^{L-1} \pi p),\,cos(2^{L-1} \pi p)) $$
+
+&#160;먼저, viewing direction θ, φ (2차원)을 데카르트 좌표계 기준의 3차원 벡터로 변환합니다. 이후 location 및 viewing direction을 [-1, 1] 범위로 normalize 합니다. 점의 location($ x, y, z $) 및 viewing direction을 각각 위 수식의 $ p $에 대입하여 증폭된 벡터($ 2L $ 차원)를 얻습니다. 총 3개의 위치 정보와 3개의 방향 정보가 각각 위 수식과 같은 positional encoding 과정이 적용되는 것입니다. 
+
+&#160;논문에서 location 정보에 대해서는 $ L $ 값을 10으로 채택하였고, viewing direction 정보에 대해서는 $ L $ 값을 4로 지정했습니다. 지금까지 설명한 것을 토대로, location정보는 3차원에서 60차원이 되며 (3$ \times $ (10$ \times $2)), viewing direction 정보는 2차원에서 3차원으로 변환된 후 24차원이 됨(3$ \times $(4$ \times $2))을 알 수 있습니다.
+
+&#160;이렇게 input을 고차원으로 만듦으로써 positon이나 direction 변화에도 input값에 있어 큰 변화가 되기 때문에 더 미세한 정보를 MLP에 담을 수 있는 효과가 있으며, 결국 scene 내부의 세부적인 구조와 질감을 표현하는 데 도움이 됩니다.
 
 
+
+
+
+<br><br><br>
 
 ## Reference
 [사진1](https://en.wikipedia.org/wiki/Mona_Lisa) <br>

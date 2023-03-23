@@ -299,15 +299,36 @@ $$ \hat{w}_i = {w_i \over \sum\limits_{j=1}^{N_c}{w_j}} $$
 
 $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p), \,...\,, sin(2^{L-1} \pi p),\,cos(2^{L-1} \pi p)) $$
 
-&#160;먼저, viewing direction θ, φ (2차원)을 데카르트 좌표계 기준의 3차원 벡터로 변환합니다. 이후 location 및 viewing direction을 [-1, 1] 범위로 normalize 합니다. 점의 location($ x, y, z $) 및 viewing direction을 각각 위 수식의 $ p $에 대입하여 증폭된 벡터($ 2L $ 차원)를 얻습니다. 총 3개의 위치 정보와 3개의 방향 정보가 각각 위 수식과 같은 positional encoding 과정이 적용되는 것입니다. 
+&#160;먼저, viewing direction $ θ, φ $(2차원)을 데카르트 좌표계 기준의 3차원 벡터로 변환합니다. 이후 location 및 viewing direction을 $ [-1, 1] $ 범위로 normalize 합니다. 그런 다음, 점의 location($ x, y, z $) 및 viewing direction을 각각 위 수식의 $ p $에 대입하여 증폭된 벡터($ 2L $ 차원)를 얻습니다. 총 3개의 위치 정보와 3개의 방향 정보가 각각 위 수식과 같은 positional encoding 과정이 적용되는 것입니다. 
 
 &#160;논문에서 location 정보에 대해서는 $ L $ 값을 10으로 채택하였고, viewing direction 정보에 대해서는 $ L $ 값을 4로 지정했습니다. 지금까지 설명한 것을 토대로, location정보는 3차원에서 60차원이 되며 (3$ \times $ (10$ \times $2)), viewing direction 정보는 2차원에서 3차원으로 변환된 후 24차원이 됨(3$ \times $(4$ \times $2))을 알 수 있습니다.
 
 &#160;이렇게 input을 고차원으로 만듦으로써 positon이나 direction 변화에도 input값에 있어 큰 변화가 되기 때문에 더 미세한 정보를 MLP에 담을 수 있는 효과가 있으며, 결국 scene 내부의 세부적인 구조와 질감을 표현하는 데 도움이 됩니다.
 
 
+<br>
 
+## 7. MLP Structure
 
+&#160;이번 단원에서는 NeRF의 neural network의 구조, batch size, optimization 알고리즘 등에 대해 설명하겠습니다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture13.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진13) Fully-connected network architecture
+  </figcaption>
+</figure>
+
+&#160;위 그림은 NeRF에서 사용된 MLP의 구조를 나타냅니다. 파란색 상자는 hidden layer를 표현하며, 초록색 상자는 input을, 빨간색 상자는 output을 표현합니다. $ \gamma $는 positional encoding 함수를 나타냅니다. 또한 검정색 실선 화살표는 ReLU activation을, 검정색 점선 화살표는 sigmoid activation을, 주황색 화살표는 activation이 없음을 나타냅니다. 
+
+&#160;주목할 포인트는 3D point의 위치($ x $), 방향($ d $) 벡터가 MLP에 입력되는 타이밍과, 색상(RGB)와 밀도($ \sigma $)벡터의 출력 타이밍입니다. Location($ x $)만 갖고 layer를 투과하여 density($ \sigma $)가 예측되며, density가 출력될 때 direction($ d $) 정보까지 추가적으로 입력되어 색상(RGB) 이 예측됩니다. 이는 [2단원](#2-nerf-개요)에서 설명한 NeRF의 "density는 점의 위치에 따라 결정되고 color는 점의 위치와 바라보는 방향에 따라 결정된다"는 성질을 반영하고 있습니다.
+
+&#160;Layer당 unit 수는 마지막 layer를 제외하고 256개이며, [DeepSDF 아키텍처]()를 따르기 때문에 5번째 hidden layer에서 skip connection을 위해 한번 더 위치 벡터($ x $)을 대입합니다 (exploding gradient problem 해결을 위해서).
+
+&#160;4096개의 ray가 하나의 batch를 이룹니다. Ray상에서 샘플링은 [5단원]()에서 배웠던 hierarchical volume sampling을 사용하며 coarse network를 위해 64개의 point를($ N_c = 64 $), fine network를 위해 128개를 추가적으로 샘플링하여 192개의 point를 사용합니다($ N_f = 128 $). 따라서 한 ray당 256번의 query가 일어난다고 할 수 있습니다.
+
+&#160;Optimizing 알고리즘으로는 adam optimizer를 사용하며($ \beta_1 = 0.9, \beta_2 = 0.999 $), learning rate 를 $ 5 \times 10^{-4} $ 에서 $ 5 \times 10^{-5} $ 으로 decay합니다. Iteration 횟수는 일반적으로 10만회에서 30만회 정도 수행합니다.
 
 <br><br><br>
 

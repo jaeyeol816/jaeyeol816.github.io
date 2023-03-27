@@ -260,7 +260,7 @@ $$ \hat{w}_i = {w_i \over \sum\limits_{j=1}^{N_c}{w_j}} $$
 **(5)** 최종적으로 $ N_c + N_f $ 개의 point를 모두 fine network에 입력하여 각 point의 color & density를 얻은 후, volume rendering을 사용하여 최종적인 color 예측값을 산출합니다.
 <br><br>
 
-**Sampling 알고리즘: Inverse Transform Sampling**
+**샘플링 알고리즘: Inverse Transform Sampling**
 
 &#160;확률변수가 ray상의 point이고 (확률값이 weight인) 확률밀도함수(PDF)가 주어졌다고 했을 때, 위에 설명된 weight들의 확률분포에 따라 임의의 point들을 선택하고 싶은 상황입니다.
 
@@ -299,7 +299,7 @@ $$ \hat{w}_i = {w_i \over \sum\limits_{j=1}^{N_c}{w_j}} $$
 
 $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p), \,...\,, sin(2^{L-1} \pi p),\,cos(2^{L-1} \pi p)) $$
 
-&#160;먼저, viewing direction $ θ, φ $(2차원)을 데카르트 좌표계 기준의 3차원 벡터로 변환합니다. 이후 location 및 viewing direction을 $ [-1, 1] $ 범위로 normalize 합니다. 그런 다음, 점의 location($ x, y, z $) 및 viewing direction을 각각 위 수식의 $ p $에 대입하여 증폭된 벡터($ 2L $ 차원)를 얻습니다. 총 3개의 위치 정보와 3개의 방향 정보가 각각 위 수식과 같은 positional encoding 과정이 적용되는 것입니다. 
+&#160;이 수식에 대입하기에 앞서, viewing direction $ θ, φ $(2차원)을 데카르트 좌표계 기준의 3차원 벡터로 변환합니다. 이후 location과 viewing direction을 $ [-1, 1] $ 범위로 normalize 합니다. 그런 다음, 점의 location($ x, y, z $) 및 viewing direction을 각각 위 수식의 $ p $에 대입하여 증폭된 벡터($ 2L $ 차원)를 얻습니다. 총 3개의 위치 정보와 3개의 방향 정보가 각각 위 수식과 같은 positional encoding 과정이 적용되는 것입니다. 
 
 &#160;논문에서 location 정보에 대해서는 $ L $ 값을 10으로 채택하였고, viewing direction 정보에 대해서는 $ L $ 값을 4로 지정했습니다. 지금까지 설명한 것을 토대로, location정보는 3차원에서 60차원이 되며 (3$ \times $ (10$ \times $2)), viewing direction 정보는 2차원에서 3차원으로 변환된 후 24차원이 됨(3$ \times $(4$ \times $2))을 알 수 있습니다.
 
@@ -330,6 +330,51 @@ $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p
 
 &#160;Optimizing 알고리즘으로는 adam optimizer를 사용하며($ \beta_1 = 0.9, \beta_2 = 0.999 $), learning rate 를 $ 5 \times 10^{-4} $ 에서 $ 5 \times 10^{-5} $ 으로 decay합니다. Iteration 횟수는 일반적으로 10만회에서 30만회 정도 수행합니다.
 
+<br>
+
+## 8. NeRF Volume Rendering
+
+&#160;[5단원](#5-hierarchical-volume-sampling)에서는 한 ray에서 여러 point를 샘플링하는 방법에 대해 배웠고, [3단원](#3-ray와-volume-rendering-개요)에서는 point들의 MLP 아웃풋들을 volume rendering하여 ray의 예측 색상값을 구한다는 것도 알아보았습니다. 
+&#160;이번 단원에서는 volume rendering과정을 더 구체적으로 공식화하여 알아보도록 하겠습니다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture14.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진14) t에 대한 ray의 표현
+  </figcaption>
+</figure>
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Math1.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (수식) Classic Volume Rendering
+  </figcaption>
+</figure>
+
+&#160;위 수식은 ray의 $ t_n $ 지점부터 $ t_f $ 지점까지의 연속적인 점들에 대한 color를 구하는 volume rendering 수식입니다. (사진14)에서 볼 수 있듯이, $ t_n $은 rendering 대상의 시작점(near bound)을 의미하고 $ t_f $ 는 rendering 대상의 끝점(far bound)을 의미합니다. <br>
+&#160;Volume rendering은 $ t_n $ 과 $ t_f $ 사이 구간에서, 각 $ t $ 에 대한 "위치($ r(t) $)와 보는 방향($ d $)에 대한 color값", "보는 방향($ d $)에 대한 density값", 그리고 "$ T(t) $" 를 연속적으로 더하는(적분하는) 것임을 확인할 수 있습니다. <br>
+&#160;그렇다면 $ T(t) $ 가 의미하는 것은 무엇일까요? 수식의 오른쪽 부분을 보면, $ T(t) $ 는 $ t_n $(시작점) 에서 $ t $ 까지 density들을 적분한 후, 그것을 $ y = e^{-x} $ 에 대입한 것이라고 되어 있습니다.  $ y = e^{-x} $ 그래프의 증감 방향을 고려할 때, density들을 적분한 값이 작아질 수록 $ T(t) $ 의 값은 커짐을 알 수 있습니다. 즉, 해당 point 앞을 가로막고 있는 point들의 밀도가 작을 수록 해당 point가 큰 비중을 갖는다고 해석할 수 있죠. 앞에 뭔가가 없을수록 뒤에 있는 것이 잘 보인다는 자연적인 원리를 생각해 볼 때 매우 합리적인 과정이라고 할 수 있습니다. 
+
+&#160;하지만, NeRF에서는 현실적으로 연속적인 모든 점들에 대한 color, density, $ T(t) $ 를 계산하기 힘듭니다. [5단원](#5-hierarchical-volume-sampling) 에서 배운 대로 일정 개수만큼의 점을 샘플링하기 때문에, 위 classic volume sampling 근사한 아래 volume rendering을 사용합니다. 
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Math2.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (수식) NeRF Volume Rendering
+  </figcaption>
+</figure>
+
+&#160;NeRF에서는 이산적으로 샘플링 된 점에 대해 volume rendering을 수행하지만, 적분($ \int $)이 합계 ($ \sum $)으로 바뀌었을 뿐, 각 구성 요소가 의미하는 것은 크게 다르지 않습니다. <br>
+&#160;[5단원](#5-hierarchical-volume-sampling)에서 배운 coarse network와 fine network를 위해 샘플링된 점들 ($ N_c $ 또는 $ N_f $)이 있습니다. $ N_c $ 또는 $  N_c + N_f $ 만큼 반복하며 color, density, $ T $값을 곱하여 더해줍니다 ($ T $ 의 의미에 대해서는 두 단락 이전 내용 참고할 것). <br>
+&#160;이 때, density($ \delta $) 가 그냥 대입되는 것이 아니라 $ 1 - e^{-\sigma_i \delta_i} $ 함수가 적용되어 대입되는 것이 특징입니다. density가 커질 수록 큰 값을 갖지만, 1을 넘지는 않게 함으로써 이산적인 확률변수의 확률값의 특징을 갖도록 하였습니다. 그래프를 토대로 density가 커질수록 해당 함수의 함숫값도 커짐을 확인할 수 있습니다. $ \delta_i $ 샘플링된 점 사이의 간격을 의미합니다 ($ \delta_i = t_{i+1} - t_{i}$).
+
+
+
+
+
 <br><br><br>
 
 ## Reference
@@ -347,3 +392,5 @@ $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p
 [사진9](https://arxiv.org/abs/2003.08934) <br>
 [사진10](DNeRF논문) <br>
 [사진11](https://youtu.be/FSG5bCkNWWo) <br>
+[사진13]() <br>
+[사진14](https://youtu.be/FSG5bCkNWWo) <br>

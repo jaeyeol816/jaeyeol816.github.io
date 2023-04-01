@@ -227,6 +227,8 @@ NeRF가 실제로 어떤 분야에서 어떻게 활용될 수 있을까요?
 
 ## 5. Hierarchical Volume Sampling
 
+**개요**
+
 &#160;[4단원](#4-nerf-학습-과정-정리)의 2단계에서 소개된, 학습시 input으로 사용할 point들을 샘플링하는 과정에 대한 설명입니다. <br>
 &#160;NeRF에서 적절한 샘플링 포인트를 선택하는 것은 중요합니다. 너무 많은 point들을 선택하면 계산 비용이 많이 들기에 실제로 물체가 존재하는(즉, 더 많은 정보를 표현하고 있는) point들을 집중적으로 선택하는 것이 더 효율적이죠. 따라서 NeRF에서는 성능을 향상시키기 위해 point들을 샘플링 할 때 ray 전체에 걸쳐 고르게 sampling하는 것이 아니라 밀도가 높은 영역에서 더 많이 샘플링 하는 Hierarchical volume sampling이 이루어집니다. <br>
 &#160;Hierarchical volume sampling은 전체 ray에서 균등하게 샘플링된 점으로 먼저 예측 색상을 계산하고(coarse network), 이 중에서 밀도 가 높은 점들을 집중적으로 샘플링하여 최종 예측 색상을 계산하는 과정(fine network) 입니다. <br>
@@ -275,7 +277,7 @@ $$ \hat{w}_i = {w_i \over \sum\limits_{j=1}^{N_c}{w_j}} $$
 &#160;이때 PDF를 적분하여, 확률변수가 특정 값 이하가 될 확률분포를 나타내는 CDF(Cumulative distribution function) 를 구할 수 있습니다. 이 때 CDF의 함숫값은 \[0,1\] 범위에서 균일 분포(uniform distribution)를 갖습니다. 여기서 CDF의 함숫값을 난수에 따라 샘플링하고 이에 대응하는 x값을 선택하면, (즉, CDF의 역함수에서 \[0,1\] 사이의 특정 확률 분포를 따르는 x값에 대응하는 함숫값을 선택하면,) x값을 '처음 x의 확률분포에 따라서' 샘플링한 값이 됩니다. 이는 "연속적인 $ X $에 대한 CDF $ Y=F(X) $ 에 대해 $ Y $는 균일 분포를 따른다"는 성질 때문입니다.
 &#160;이 과정을 inverse transform sampling이라고 하고, 더 알아보고 싶으면 [위키피디아](https://en.wikipedia.org/wiki/Inverse_transform_sampling)를 참고해 주세요.
 
-&#160;이처럼 Inverse transform sampling을 사용하면 주어진 화률 분포에서 난수를 생성할 수 있고, 결과적으로 coarse network에서 구한 밀도 분포에 따라 fine network의 입력 point들을 비례적으로 샘플링 할 수 있습니다. 즉, 더 밀도가 높아 더 영향을 많이 주는 point들을 더 많이 샘플링 할 수 있다는 것입니다.
+&#160;이처럼 Inverse transform sampling을 사용하면 주어진 화률 분포에서 난수를 생성할 수 있고, 결과적으로 coarse network에서 구한 밀도 분포에 따라 fine network의 입력 point들을 비례적으로 샘플링 할 수 있습니다. **즉, 더 밀도가 높아 더 영향을 많이 주는 point들을 더 많이 샘플링 할 수 있다는 것입니다.**
 
 <br>
 
@@ -334,7 +336,7 @@ $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p
 
 ## 8. NeRF Volume Rendering
 
-&#160;[5단원](#5-hierarchical-volume-sampling)에서는 한 ray에서 여러 point를 샘플링하는 방법에 대해 배웠고, [3단원](#3-ray와-volume-rendering-개요)에서는 point들의 MLP 아웃풋들을 volume rendering하여 ray의 예측 색상값을 구한다는 것도 알아보았습니다. 
+&#160;[5단원](#5-hierarchical-volume-sampling)에서는 한 ray에서 여러 point를 샘플링하는 방법에 대해 배웠고, [3단원](#3-ray와-volume-rendering-개요)에서는 point들의 MLP 아웃풋들을 volume rendering하여 ray의 예측 색상값을 구한다는 것도 알아보았습니다. <br>
 &#160;이번 단원에서는 volume rendering과정을 더 구체적으로 공식화하여 알아보도록 하겠습니다.
 
 <figure style="display:block; text-align:center;">
@@ -371,9 +373,67 @@ $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p
 &#160;[5단원](#5-hierarchical-volume-sampling)에서 배운 coarse network와 fine network를 위해 샘플링된 점들 ($ N_c $ 또는 $ N_f $)이 있습니다. $ N_c $ 또는 $  N_c + N_f $ 만큼 반복하며 color, density, $ T $값을 곱하여 더해줍니다 ($ T $ 의 의미에 대해서는 두 단락 이전 내용 참고할 것). <br>
 &#160;이 때, density($ \delta $) 가 그냥 대입되는 것이 아니라 $ 1 - e^{-\sigma_i \delta_i} $ 함수가 적용되어 대입되는 것이 특징입니다. density가 커질 수록 큰 값을 갖지만, 1을 넘지는 않게 함으로써 이산적인 확률변수의 확률값의 특징을 갖도록 하였습니다. 그래프를 토대로 density가 커질수록 해당 함수의 함숫값도 커짐을 확인할 수 있습니다. $ \delta_i $ 샘플링된 점 사이의 간격을 의미합니다 ($ \delta_i = t_{i+1} - t_{i}$).
 
+<br>
+
+## 9. Loss Computation
+
+&#160;모델을 optimize하기 위해서는 예측값의 실제 ground truth값과의 오차를 계산하는 loss computation 과정이 필요합니다. <br>
+&#160;Ground truth는 우리가 입력한 이미지들의 픽셀의 color값 입니다. 이 픽셀에 대응하는 하나의 ray에 대해 query한 점들의 color와 density를 기반으로 [volume rendering](#8-nerf-volume-rendering) 하면 예측한 color 값을 얻을 수 있습니다. 이 둘의 차의 L2 norm을 통해 rendering loss를 구합니다. 수식은 아래와 같습니다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Math3.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (수식) Loss Computation
+  </figcaption>
+</figure>
+
+&#160;일정 간격으로 샘플링한 $ N_c $ 개의 샘플을 coarse network에 대입하여 얻은 출력값을 volume rendering 하여 $ \hat{C}_c(r) $ 값을 얻습니다. 그리고 밀도가 높은 곳에서 샘플링 빈도를 높인 $ N_c + N_f $ 개의 샘플을 fine network에 대입하여 얻은 출력값을 volume rendering 하여 $ \hat{C}_f(r) $ 값을 얻습니다. 이 둘의 loss를 더하여 한 ray에 대한 loss를 계산할 수 있죠. (Sampling에 대한 자세한 설명은 [5단원](#5-hierarchical-volume-sampling)을 참고해 주세요.)
+
+&#160;Batch에 담긴 ray의 수만큼 이 과정을 반복하여 전부 더하여 batch에 대한 cost를 얻습니다. 이 cost를 얻은 후, 이를 기반으로 gradient를 계산하여 back-propagation을 실시합니다. 이것까지가 한 iteration이라고 할 수 있습니다. Volume rendering 공식이 미분 가능하기에 편리하게 최적화할 수 있습니다. <br>
+&#160;논문에서는 ablation study를 통해 batch size를 4096개의 ray로 채택했으며, $ N_c $는 64, $ N_f $ 는 128을 채택했습니다.
+
+&#160;결과적으로 3차원 물체를 학습시키기 위해 필요한 것은 3차원 데이터가 아닌, 2차원 이미지 (color map)과 카메라 파라미터(카메라의 위치, rotation등의 정보) 뿐입니다. 필자가 실험을 해본 결과, 개인적으로 찍은 사진들을 갖고도 [colmap](https://github.com/colmap/colmap) 프로그램을 통해 카메라 파라미터를 계산한다면 바로 NeRF 모델을 학습시킬 수 있었습니다. 이러한 단순성이 NeRF의 큰 장점 중 하나라고 생각합니다.
+
+<br><br>
+
+# IV. 결론
+- NeRF가 다른 모델과 비교해서 가지는 이점이 무엇인지, 단점과 개선 방향은 어떤 것이 있는지에 대해 설명하겠습니다.
+
+## 10. 성능 비교
+
+&#160;논문에서는 NeRF모델을 SRN, NV, LLFF와 비교하였습니다. 
+- SRN(Scene Representation Networks)는 불투명한 표면의 데이터를 표현하는 모델로써, 특정 좌표의 feature vector를 예측하는 부분, feature vector으로부터 색상을 예측하는 부분으로 나뉩니다.
+- NV(Neural Volume)는 복셀 그리드(voxel grid)를 재구성하는 모델로써 배경과 객체가 따로 주어져야 한다는 특징이 있습니다.
+- LLFF(Local Light Field Fusion)는 실사 기반의 뷰 생성을 위한 모델로써, 3D CNN을 사용하여 불연속적인 RGB grid를 예측합니다.
+
+&#160;그리고 뷰를 합성한 결과를 ground truth와 비교할 때 사용한 평가 지표로는 PSNR, SSIM, LPIPS를 사용했습니다.
+- [PSNR](https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio): 최대 신호에서의 잡음 비율로써, 대조군에 대한 화질 손실의 정도를 평가합니다. 값이 높을수록 좋습니다.
+- [SSIM](https://en.wikipedia.org/wiki/Structural_similarity): 두 의미지의 유사도를 다양한 요소를 통해 분석합니다. 값이 높을수록 좋습니다.
+- [LPIPS](https://arxiv.org/pdf/1801.03924.pdf): 딥러닝 네트워클르 사용하여 high level feature를 추출하여 유사도를 평가합니다. 값이 낮을수록 좋습니다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Table1.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (표) 다양한 모델(SRN, NV, LLFF, NeRF)의 중간 뷰 합성 성능 비교
+  </figcaption>
+</figure>
+
+&#160;3D 객체를 나타내는 "Diffuse Synthetic 360 데이터"와 "Realistic Synthetic 360" 데이터에 대해서는 NeRF가 다른 모델과 비교했을때 모든 지표상에서 뛰어난 결과를 나타냈고, 실사 기반의 Real Forward Facing 데이터에 대해서는 LPIPS 지표를 제외하고 뛰어난 결과를 나타냈습니다.
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/nr1/Picture15.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (사진15) 다양한 모델(SRN, NV, LLFF, NeRF)의 중간 뷰 합성 결과 비교
+  </figcaption>
+</figure>
+
+&#160;주관적 화질 비교 결과 NeRF가 섬세한 디테일을 대체로 잘 표현하며 경계선을 더 안정적으로 나타내는 것으로 확인되었습니다. 그럼에도 불구하고, 빛 반사에 대해서는 개선이 필요한 부분이 보입니다.
 
 
-
+## 11. 한계 및 개선점
 
 <br><br><br>
 

@@ -88,7 +88,7 @@ use_math: true
 
 **NeRF란 무엇일까요?**
 
-&#160;NeRF는 3D 공간 내 입자들의 color값과 density값을 neural network의 파라미터로 표현하는 것입니다. 1단원에서 언급한 용어를 빌리자면, 3D 데이터를 explicit하게 voxel 또는 point cloud으로 나타내는 것이 아니라, 딥러닝을 통해 학습된 MLP (multi-layer perceptron) 상에서 (implicit하게) 3D 데이터를 reconstruct하는 것이라고 볼 수 있죠. 
+&#160;NeRF는 3D 공간 내 입자들의 color값과 density값을 neural network의 파라미터로 표현하는 것 + 해당 정보를 원하는 view에 맞추어 렌더링 하는 것 입니다. 1단원에서 언급한 용어를 빌리자면, 3D 데이터를 explicit하게 voxel 또는 point cloud으로 나타내는 것이 아니라, 딥러닝을 통해 학습된 MLP (multi-layer perceptron) 상에서 (implicit하게) 3D 데이터를 reconstruct하는 것이라고 볼 수 있죠. 
 
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/nr1/Picture4.png"
@@ -100,7 +100,7 @@ use_math: true
 
 &#160;NeRF모델의 학습은 물체에 대해 다양한 각도에서 촬영된 사진을 가지고 일어납니다. 학습된 NeRF모델이 있다면 우리가 물체를 특정 시점에서 바라봤을 때 어떤 색상값이 보이는지 query할 수 있습니다. 쉽게 말해, 원하는 방향으로 물체를 바라봤을 때의 이미지를 render할 수 있다는 것이죠.
 
-&#160;결국 다양한 각도에서 촬영된 이미지를 갖고 NeRF를 학습시킨 후, 중간 각도에서 바래본 새로운 이미지를 만들어낼 수 있는 것이죠. <br>
+&#160;결국 다양한 각도에서 촬영된 이미지를 갖고 NeRF를 학습시킨 후, 중간 각도에서 바라본 새로운 이미지를 만들어낼 수 있는 것이죠. <br>
 &#160;자세히 말하면, NeRF모델을 학습시키기 위해 우리가 필요로 하는 것은 (1) 특정 장면(scene)에 대해 같은 시간 다양한 각도에서 촬영한 2D 이미지들과 (2) 카메라 파라미터(카메라의 위치와 방향 및 초점거리 등의 정보) 입니다. 학습된 NeRF를 통해 알아낼 수 있는 정보는 (1) 3차원 장면 내 특정 입자의 color와 density , 그리고, 직선상의 입자들을 종합하여 계산해낼 수 있는 (2) 특정 viewing direction에서 render된 pixel의 색상 입니다.
 <br><br>
 

@@ -17,24 +17,22 @@ use_math: true
 
 순서대로 읽으시는 것을 권장드립니다!
 
-서론
-1. Implicit Neural Representation &#160;&#160; [👉바로가기](#1-implicit-neural-representation)
-2. NeRF 개요 &#160;&#160; [👉바로가기](#2-nerf-개요)
+| **서론** |
+| 1. Implicit Neural Representation &#160;&#160; | [👉바로가기](#1-implicit-neural-representation) |
+| 2. NeRF 개요 &#160;&#160; | [👉바로가기](#2-nerf-개요) |
+| **본론1 (큰 그림 이해하기)** | |
+| 3. Ray와 Volume Rendering 개요 &#160;&#160; |  [👉바로가기](#3-ray와-volume-rendering-개요) |
+| 4. NeRF의 Training및 Infering 과정 요약  &#160;&#160; | [👉바로가기](#4-nerf-학습-과정-정리) |
+| **본론2 (자세히 이해하기)** |
+| 5. Hierarchical Volume Sampling &#160;&#160; | [👉바로가기](#5-hierarchical-volume-sampling) |
+| 6. Positional Encoding &#160;&#160; | [👉바로가기](#6-positional-encoding) |
+| 7. MLP Structure &#160;&#160;  |  [👉바로가기](#7-mlp-structure) |
+| 8. NeRF Volume Rendering &#160;&#160; |   [👉바로가기](#8-nerf-volume-rendering) |
+| 9. Loss Computation &#160;&#160; |  [👉바로가기](#9-loss-computation) |
+| **마무리** | 
+| 10. 기존 모델과 비교 &#160;&#160; | [👉바로가기](#10-성능-비교) | 
+| 11. 결론 및 개선점 &#160;&#160; | [👉바로가기](#11-결론-및-개선점) |
 
-본론1 (큰 그림 이해하기)
-3. Ray와 Volume Rendering 개요  &#160;&#160; [👉바로가기](#3-ray와-volume-rendering-개요)
-4. NeRF의 Training및 Infering 과정 요약  &#160;&#160; [👉바로가기](#4-nerf-학습-과정-정리)
-
-본론2 (자세히 알아보기)
-5. Hierarchical Volume Sampling
-6. Positional Encoding
-7. NeRF MLP Structure
-8. NeRF Volume Rendering
-9. Loss Computation
-
-마무리
-10. 기존 모델과 비교
-11. 결론 및 개선점
 
 
 <br><br>
@@ -82,7 +80,7 @@ use_math: true
 &#160;하지만, 기존 방식에 비해 데이터를 읽어오는 속도가 느리다는 단점이 있습니다. 매 좌표마다 neural network의 forward연산을 수행하여야만 output값(color등)을 얻을 수 있기 때문이죠.
 
 
-&#160;NeRF(Neural Radiance Field)는 하나의 정적인 scene에 대해 implicit neural representation을 적용한 것입니다. NeRF가 무엇이고 어떤 원리가 숨어 있는지 지금부터 같이 알아보도록 해요.
+&#160;NeRF(Neural Radiance Field)는 하나의 정적인 3D 데이터에 대해 implicit neural representation을 적용한 것입니다. NeRF가 무엇이고 어떤 원리가 숨어 있는지 지금부터 같이 알아보도록 해요.
 
 <br><br>
 
@@ -90,7 +88,7 @@ use_math: true
 
 **NeRF란 무엇일까요?**
 
-&#160;NeRF는 3D 공간 내 입자들의 color값과 density값을 neural network의 파라미터로 표현하는 것입니다. 1단원에서 언급한 용어를 빌리자면, 3D 데이터를 explicit하게 voxel 또는 point cloud으로 나타내는 것이 아니라, 딥러닝을 통해 학습된 neural network 상에서 (implicit하게) 3D 데이터를 reconstruct하는 것이라고 볼 수 있죠. 
+&#160;NeRF는 3D 공간 내 입자들의 color값과 density값을 neural network의 파라미터로 표현하는 것입니다. 1단원에서 언급한 용어를 빌리자면, 3D 데이터를 explicit하게 voxel 또는 point cloud으로 나타내는 것이 아니라, 딥러닝을 통해 학습된 MLP (multi-layer perceptron) 상에서 (implicit하게) 3D 데이터를 reconstruct하는 것이라고 볼 수 있죠. 
 
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/nr1/Picture4.png"
@@ -106,7 +104,7 @@ use_math: true
 &#160;자세히 말하면, NeRF모델을 학습시키기 위해 우리가 필요로 하는 것은 (1) 특정 장면(scene)에 대해 같은 시간 다양한 각도에서 촬영한 2D 이미지들과 (2) 카메라 파라미터(카메라의 위치와 방향 및 초점거리 등의 정보) 입니다. 학습된 NeRF를 통해 알아낼 수 있는 정보는 (1) 3차원 장면 내 특정 입자의 color와 density , 그리고, 직선상의 입자들을 종합하여 계산해낼 수 있는 (2) 특정 viewing direction에서 render된 pixel의 색상 입니다.
 <br><br>
 
-**NeRF neural network의 input과 output**
+**NeRF MLP의 input과 output**
 
 &#160;NeRF 딥레닝 네트워크의 input과 output을 알아봅시다. 정보를 알고싶은 한 3차원 좌표(3d coordinate)와 바라보는 방향(viewing direction)을 집어넣으면 해당 입자의 color와 density값을 얻을 수 있습니다. 
 
@@ -283,7 +281,7 @@ $$ \hat{w}_i = {w_i \over \sum\limits_{j=1}^{N_c}{w_j}} $$
 
 ## 6. Positional Encoding
 
-&#160;NeRF의 neural network에 점의 위치($ x, y, z $)와 바라보는 각도($ θ, φ $)을 단순히 그냥 입력하는 것이 아니라 positional encoding 을 적용시켜 더 고차원의 벡터로 변화시켜 입력합니다. Positional encoding을 적용하는 이유는 MLP가 더 정밀하고 복잡한 고주파의 (high frequency) 정보를 표현하기 위해서 입니다. 이것이 어떤 의미인지 알기 위해 아래 사진을 바라봅시다.
+&#160;NeRF의 MLP에 점의 위치($ x, y, z $)와 바라보는 각도($ θ, φ $)을 단순히 그냥 입력하는 것이 아니라 positional encoding 을 적용시켜 더 고차원의 벡터로 변화시켜 입력합니다. Positional encoding을 적용하는 이유는 MLP가 더 정밀하고 복잡한 고주파의 (high frequency) 정보를 표현하기 위해서 입니다. 이것이 어떤 의미인지 알기 위해 아래 사진을 바라봅시다.
 
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/nr1/Picture12.png"
@@ -402,15 +400,15 @@ $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p
 
 ## 10. 성능 비교
 
-&#160;논문에서는 NeRF모델을 SRN, NV, LLFF와 비교하였습니다. 
+논문에서는 NeRF모델을 SRN, NV, LLFF와 비교하였습니다. 
 - SRN(Scene Representation Networks)는 불투명한 표면의 데이터를 표현하는 모델로써, 특정 좌표의 feature vector를 예측하는 부분, feature vector으로부터 색상을 예측하는 부분으로 나뉩니다.
 - NV(Neural Volume)는 복셀 그리드(voxel grid)를 재구성하는 모델로써 배경과 객체가 따로 주어져야 한다는 특징이 있습니다.
 - LLFF(Local Light Field Fusion)는 실사 기반의 뷰 생성을 위한 모델로써, 3D CNN을 사용하여 불연속적인 RGB grid를 예측합니다.
 
-&#160;그리고 뷰를 합성한 결과를 ground truth와 비교할 때 사용한 평가 지표로는 PSNR, SSIM, LPIPS를 사용했습니다.
+그리고 뷰를 합성한 결과를 ground truth와 비교할 때 사용한 평가 지표로는 PSNR, SSIM, LPIPS를 사용했습니다.
 - [PSNR](https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio): 최대 신호에서의 잡음 비율로써, 대조군에 대한 화질 손실의 정도를 평가합니다. 값이 높을수록 좋습니다.
 - [SSIM](https://en.wikipedia.org/wiki/Structural_similarity): 두 의미지의 유사도를 다양한 요소를 통해 분석합니다. 값이 높을수록 좋습니다.
-- [LPIPS](https://arxiv.org/pdf/1801.03924.pdf): 딥러닝 네트워클르 사용하여 high level feature를 추출하여 유사도를 평가합니다. 값이 낮을수록 좋습니다.
+- [LPIPS](https://arxiv.org/pdf/1801.03924.pdf): 딥러닝 네트워크를 사용하여 high level feature를 추출하여 유사도를 평가합니다. 값이 낮을수록 좋습니다.
 
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/nr1/Table1.png"
@@ -432,8 +430,22 @@ $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p
 
 &#160;주관적 화질 비교 결과 NeRF가 섬세한 디테일을 대체로 잘 표현하며 경계선을 더 안정적으로 나타내는 것으로 확인되었습니다. 그럼에도 불구하고, 빛 반사에 대해서는 개선이 필요한 부분이 보입니다.
 
+<br>
 
-## 11. 한계 및 개선점
+## 11. 결론 및 개선점
+
+&#160;NeRF는 복잡한 실사 데이터를 MLP상의 weight를 통해서 적은 크기로 표현할 수 있다는 점과, 깊이 및 3D 정보가 필요하지 않다는 점, 그리고 렌더링 과정이 미분 가능하기 때문에 gradient 기반 optimization을 사용할 수 있다는 점으로 인해 매우 혁신적인 모델로 평가받고 있습니다. 
+
+&#160;하지만 다음과 같은 단점이 존재합니다.
+- 학습 시간이 매우 느립니다. 한 장면을 정밀하게 표현하기 위해 100,000만 회 이상의 iteration을 수행해야 하며, 이는 8시간 이상의 학습 시간을 요구합니다.
+- 정적인 scene에 대해서만 표현이 가능합니다. 시간적으로 하나의 시점만 표현 가능하며, 움직이는 물체에 대한 표현이 불가합니다.
+- 하나의 scene에 overfit 합니다. 특정 물체에 대해 학습한 모델은 해당 물체에 대한 view만 합성할 수 있습니다.
+- 학습을 위해 사진들과 함께 카메라의 초점거리, 카메라의 위치, 카메라의 방향 등의 카메라 파라미터 정보가 필요합니다.
+
+&#160;2020년 NeRF가 발표된 이후, 이러한 단점을 보완하기 위해 다양한 개량형이 나오고 있습니다.
+[이 사이트](https://github.com/awesome-NeRF/awesome-NeRF)에는 NeRF를 응용한 모델에 대해 종류별로(faster training, generalization, video 등등) 잘 정리되어 있습니다. 
+
+&#160;NeRF 포스팅을 마치겠습니다. 읽어주셔서 감사합니다.😀
 
 <br><br><br>
 

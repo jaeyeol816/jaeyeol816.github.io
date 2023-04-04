@@ -34,14 +34,14 @@
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "neural_representation" %}
-                        <li><a href="/categories/nueral_representation" class="">Neural Representation ({{category[1].size}})</a></li>
+                        <li><a href="/categories/neural_representation" class="">Neural Representation ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
             <ul>
                 {% for category in site.categories %}
                     {% if category[0] == "category4" %}
-                        <li><a href="/categories/category4" class="">카테고리4 ({{category[1].size}})</a></li>
+                        <li><a href="/categories/computer_graphics" class="">Computer Graphics Basics ({{category[1].size}})</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>

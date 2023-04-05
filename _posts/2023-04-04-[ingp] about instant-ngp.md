@@ -9,7 +9,7 @@ use_math: true
 ## 들어가기에 앞서..
 
 - 이 포스팅은 SIGGRAPH 2022에 수록된 "Instant Neural Graphics Primitives with a Multiresolution Hash Encoding" 논문을 바탕으로 작성되었습니다.
-- 프로젝트 페이지 링크: <https://nvlabs.github.io/instant-ngp>
+- Instant-NGP 프로젝트 페이지 링크: <https://nvlabs.github.io/instant-ngp>
 - NeRF와 친숙하지 않으신 분들은 [필자의 NeRF 포스팅](https://jaeyeol816.github.io/neural_representation/nerf-nerf-basic-theory/)을 미리 읽으시는 것을 추천드립니다.
 - 단순히 논문을 순서대로 해석한 글이 아니라, 이해하기 쉬운 글이 되도록 순서를 재구성하였습니다. 용어는 원어의 사용을 지향하였습니다.
 
@@ -23,6 +23,21 @@ use_math: true
 2) NeRF와 positional encoding <br>
 3) Parametric Encoding <br>
 4) Dense & Sparse Parametric Encoding <br>
+5) Parametric Encoding in Instant-NGP <br>
+6) Multiresolution Hash Encoding <br> 
+7) Hyperparameters <br>
+8) 구현상의 특이사항 <br>
+9) 성능 및 결과 비교 <br>
+10) 결론 
+
+
+<br>
+
+## 1. Instant-NGP 소개
+
+&#160;[NeRF](https://jaeyeol816.github.io/neural_representation/nerf-nerf-basic-theory/)에서는 neural network 네트워크 내 '가중치'라는 파라미터들에 scene에 대한 모든 정보를 담았습니다. 이는 특정 scene에 대한 자세한 feature를 포함시키기 위해서 저차원에서 고차원까지의 feature를 표현할 수 있는 깊은 network를 요구합니다. 
+
+
 
 
 

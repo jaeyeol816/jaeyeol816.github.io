@@ -7,9 +7,9 @@ use_math: true
 
 ## 들어가기에 앞서...
 
-- 이 글은 딥러닝을 처음 접하시는 분들을 위해 개념적이고 추상적인 내용만 담았습니다. 본격적인 공부에 앞서 기본적인 내용을 이해할 수 있도록 도와드리겠습니다. 다음 포스팅에서 딥러닝의 수학적인 이해를 다루겠습니다.
-- 일부 용어에 있어서 한국어로 번역된 것보다 영어를 사용하는 것을 지향합니다. 이해해 주시면 감사하겠습니다!
-- 잘못된 내용이 있으면 언제든 피드백 주세요! 빠르게 고치도록 하겠습니다
+- 이 글은 딥러닝을 처음 접하시는 분들을 위해 개념적인 내용을 담았습니다. 배경 지식 없이도 내용을 이해할 수 있도록 도와드리겠습니다. 
+- 일부 용어에 있어서 한국어로 번역된 것보다 원어를 사용하는 것을 지향합니다. 이해해 주시면 감사하겠습니다!
+- 잘못된 내용이 있으면 언제든 피드백 주세요! 빠르게 고치도록 하겠습니다.
 
 <br>
 
@@ -20,8 +20,8 @@ use_math: true
 2. 퍼셉트론 (Weight & Activation)  &#160;&#160; [👉바로가기](#2-퍼셉트론-weight--activation)
 3. 다중 퍼셉트론  &#160;&#160; [👉바로가기](#3-다중-퍼셉트론)
 4. Layer  &#160;&#160; [👉바로가기](#4-unit과-layer)
-5. 학습이란? Weight를 찾아가는 과정이다! &#160;&#160; [👉바로가기](#5-학습이란-weight를-조정해-가는-과정이다)
-6. Forward-propagation과 Loss &#160;&#160; [👉바로가기](#6-forward-propagation과-loss)
+5. 학습이란? Weight를 찾아가는 과정이다! &#160;&#160; [👉바로가기]()
+6. Forward-propagation과 Loss &#160;&#160; [👉바로가기](#6-forward-propagation)
 7. Gradient와 Back-propagation &#160;&#160; [👉바로가기](#7-gradient와-back-propagation)
 8. 정리하자면... &#160;&#160; [👉바로가기](#8-정리하자면)
 
@@ -183,16 +183,14 @@ use_math: true
 </figure>
 
 &#160;노드 간 연결되는 선분을 '가중치(weight)'라고 생각할 수 있습니다. 2단원에서 배웠던 퍼셉트론의 가중치와 같은 의미로써, 특정 노드 기준으로 연결된 이전 노드의 비중이 얼마나 되는지를 나타냅니다. (특정 노드가 내포하고 있는 특성이 이전 노드와 얼마나 관련이 있는지). Training(학습)이 일어나면서 연결의 정도가 큰 노드 사이의 가중치는 점차 커지게 되며, 그렇지 않은 가중치는 작아지게 됩니다. 
-
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/deep1/TempD.png" width="200px"
         style=""> 
   <figcaption style="text-align:center; font-size:13px; color:#808080">
-    (그림12) 가중치 행렬 $ W_N $
+    (그림12) 가중치 행렬 $ W^{[N]} $
   </figcaption>
 </figure>
-
-&#160;$ N-1 $ 번째 layer과 $ N $ 번째 layer 사이의 모든 가중치를 하나의 가중치 행렬 $ W_N $ 로 나타낼 수 있습니다. $ i $번 행, $ j $번 열에 존재하는 가중치는 $ N-1 $ 번 layer의 $ j $번째 노드와 $ N $ 번 layer의 $ i $번째 노드 사이를 연결하는 가중치입니다.
+&#160;$ N-1 $ 번째 layer과 $ N $ 번째 layer 사이의 모든 가중치를 하나의 가중치 행렬 $ W^{[N]} $ 로 나타낼 수 있습니다. $ i $번 행, $ j $번 열에 존재하는 가중치는 $ N-1 $ 번 layer의 $ j $번째 노드와 $ N $ 번 layer의 $ i $ 번째 노드 사이를 연결하는 가중치입니다.
 
 
 **Layer의 개수** <br>
@@ -204,26 +202,30 @@ use_math: true
 
 ## 5. 학습이란? 가중치를 조정해 가는 과정이다!
 
-&#160;Neural Network를 하나의 "함수"라고 생각해 봅시다. 우리가 이 함수에 데이터를 입력하면, 함수는 예측값을 출력합니다. 이때 예측값을 정확하게, 즉 실제값과 비슷하게 출력하도록 만드는 것이 우리의 목표입니다.
+&#160;데이터가 어떤 뉴런 하나를 통과하는 것은 이전 layer의 모든 뉴런의 아웃풋에 대한 weighted sum(가중합)을 구한 후 활성화 함수에 대입하는 과정이라고 볼 수 있습니다. 이 때 뉴런의 아웃풋에 영향을 미칠 수 있는 것은 가중치들 입니다. 따라서 '학습'이라는 것은 최적의 예측값을 만들도록 각 뉴런의 가중치들을 조정하는 과정입니다. 학습이 진행됨에 따라 weight는 점차 업데이트됩니다. 이렇게 학습이 되는 과정에서 값이 변화하며 모델의 output에 영향을 주는 것을 '모델의 파라미터(parameter)'라고도 합니다. <br>
+
+&#160;전체적으로 생각을 해 봅시다. Neural Network를 하나의 "함수"라고 생각해 봅시다. 우리가 이 함수에 데이터를 입력하면, 이 함수는 수많은 뉴런을 통과시킨 결과값을 출력합니다. 이때 예측값을 정확하게, 즉 실제값과 비슷하게 출력하도록 만드는 것이 우리의 목표입니다.
+
 <figure style="display:block; text-align:center;">
-  <img src="/assets/images/deep1/Picture9.png"
+  <img src="/assets/images/deep1/TempE.png"
         style=""> 
   <figcaption style="text-align:center; font-size:13px; color:#808080">
-    (사진9) 학습이 반복됨에 따라 weight값들이 업데이트됨
+    (그림13) Supervised learning 오버뷰
   </figcaption>
 </figure>
-&#160;데이터가 'layer를 통과하는 것'은 '각 unit에 있는 weight가 곱해진 후 activation function을 통과하는 것'과 마찬가지 입니다. 그러므로 정해진 구조의 Neural Network의 아웃풋을 결정하는 것은 각 Unit의 weight입니다. 따라서 '학습'이라는 것은 최적의 예측값을 만들도록 각 Unit의 weight들이 업데이트되는 과정입니다. 학습이 진행됨에 따라 weight는 점차 변화합니다. <br>
-> &#160;믈론 weight뿐 아니라 각 Unit에 linear function부분에 존재하는 bias도 업데이트 하지만, 이는 다음 포스팅에서 자세히 다뤄 보도록 하겠습니다. (이번 포스팅에서는 weight에 대해서만 언급하겠습니다)
 
-&#160;그렇다면 weight는 어떻게 업데이트 되는 것일까요? 매 반복 주기(Iteration)마다 input데이터에 대한 예측값이 출력되고, 예측값에 대한 오차(loss)를 계산한 후, 현재 weight들에 대한 loss의 "변화율"에 기반하여 weight들을 업데이트해나갑니다. 이러한 반복이 진행되면 진행될수록 weight들은 더 낮은 loss를 갖는 예측값을 출력하도록 변화하게 됩니다. 어렵게 느껴지시나요? 이후 내용에서 설명이 이어집니다.
+&#160;우리는 수많은 데이터(training set)를 가지고 학습을 진행합니다. 데이터들이 라벨링되어 있다고 해 봅시다. input값에 대한 라벨(ground truth)이 쌍으로 존재합니다. Input값을 모델에 대입하면 모델은 정해진 구조(architecture)에 분포된 파라미터에 의해 계산된 예측값을 출력합니다. 이 예측값이 해당 데이터의 실제 ground truth와 얼마나 가까운지 측정합니다. (오차(loss)를 계산합니다). 이 loss를 기반으로 모델을 구성하는 파라미터들을 업데이트할 수 있습니다. 이 과정이 한번 반복되었을 때 iteration이 한번 수행되었다고 합니다.
 
-&#160;Deep Learning이라는 용어의 뜻도 어렵게 이해할 필요가 없어요. "Deep" 하다는 것은 layer가 여러 겹 있다는 뜻이고, "Learning" 은 그 상태에서 각 layer의 weight를 업데이트해가며 학습을 한다는 것입니다!
+
+&#160;그렇다면 파라미터 어떻게 업데이트 되는 것일까요? 현재 weight들에 대한 loss의 "변화율"에 기반하여 weight들을 업데이트 해나갑니다. 이러한 반복이 진행되면 진행될수록 weight들은 더 낮은 loss를 갖는 예측값을 출력하도록 변화하게 됩니다. 이후 내용에서 설명이 이어집니다.
+
+&#160;Deep Learning이라는 용어의 뜻은 어렵게 이해할 필요가 없어요. "Deep" 하다는 것은 layer가 여러 겹 있다는 뜻이고, "Learning" 은 그 상태에서 각 layer의 파라미터들을 업데이트해가며 학습을 한다는 것입니다!
 
 <br><br>
 
-## 6. Forward-propagation과 Loss
+## 6. Forward-propagation
 
-&#160;[5단원](#5-학습이란-weight를-조정해-가는-과정이다)에서 딥러닝에서 '학습'이라는 것이 무엇인지 배웠습니다. 이번 단원부터 학습이 일어나는 과정을 한가지 예시와 함께 조금 더 자세히 살펴보도록 해요.
+&#160;[5단원]()에서 딥러닝에서 '학습'이라는 것이 무엇인지 배웠습니다. 이번 단원부터 학습이 일어나는 과정을 한가지 예시와 함께 조금 더 자세히 살펴보도록 해요.
 
 &#160;연예인의 '키', '몸무게', '눈 크기', '코 높이' 를 갖고 '호감 여부'를 예측하는 모델을 만들고 싶습니다. 이 때 학습을 위한 데이터셋은 아래와 같이 주어졌습니다. 
 
@@ -231,49 +233,70 @@ use_math: true
   <img src="/assets/images/deep1/Picture10.png"
         style=""> 
   <figcaption style="text-align:center; font-size:13px; color:#808080">
-    (사진10) 데이터셋 예시
+    (그림14) 데이터셋 예시
   </figcaption>
 </figure>
 
-&#160;이 데이터에서 초록색 부분은 input입니다. &#160;Input값을 neural network에 넣으면 여러 Layer를 차례대로 통과하며, 마지막 Layer에서는 '호감일 확률'이라는 예측값 출력합니다. &#160; 그런 다음 우리는 이 예측값과 ground truth값 사이의 오차를 계산합니다. 이 과정을 'Forward Propagation'이라고 하죠.
-
-&#160;이 경우 input vector의 크기가 4이므로 input layer의 크기는 4입니다. 첫번째 hidden layer의 모든 unit으로 input vector가 들어가게 됩니다.
+&#160;위 데이터에서 호감 여부는 라벨이므로 따로 $ y $ 로 분리하고, 나머지 4개의 input data를 행렬 $ X $ 로 표현해 보면 아래와 같습니다.
 
 <figure style="display:block; text-align:center;">
-  <img src="/assets/images/deep1/Picture11.png"
+  <img src="/assets/images/deep1/TempF.png"
         style=""> 
   <figcaption style="text-align:center; font-size:13px; color:#808080">
-    (사진11) 연예인A의 데이터가 첫번째 hidden layer까지 투과한 상황
+    (그림15) 한 iteration에 사용할 input 행렬 $ X $
   </figcaption>
 </figure>
-
-&#160; 첫번째 hidden layer의 각 unit는 초기화된 weight가 다르기 때문에 저마다 다른 output을 출력합니다. 이 값들은 두번째 hidden layer의 모든 unit에 들어가게 됩니다.
-
-&#160;두번째 hidden layer의 unit들도 마찬가지로 저마다 첫 hidden layer의 output을 갖고 각자의 output 을 만들어 냅니다. 
+&#160;$ X $ 의 행의 수는 iteration에 사용할 데이터의 수이며, 열의 수는 특성(feature)의 수 입니다. 
 
 <figure style="display:block; text-align:center;">
-  <img src="/assets/images/deep1/Picture12.png"
+  <img src="/assets/images/deep1/TempG.png"
         style=""> 
   <figcaption style="text-align:center; font-size:13px; color:#808080">
-    (사진12) 연예인A의 데이터가 output layer까지 투과한 상황 (ground truth와 비교)
+    (그림16) 첫 layer에서의 연산
   </figcaption>
 </figure>
 
-&#160;이러한 두번째 hidden layer의 output은 마지막 layer의 input이 되며, 마지막 layer는 최종적인 '호감도가 1일 확률'을 출력합니다.
+&#160;첫번째 layer를 통과해 보겠습니다. 첫 layer의 가중치 행렬 $ W^{[1]} $ 에 input 행렬 $ X $ 이 곱해지며, 각 행에 대응하는 bias 벡터 $ b^{[1]} $ 의 값이 더해집니다. (굳이 bias라는 것을 두어 이를 더하는 이유에 대해서는 아래에 설명하였습니다). 여기까지 수식으로 나타내면 $ Z^{[1]} = W^{[1]}X + b^{[1]} $ 입니다.
 
-&#160;학습 데이터셋에 대해서 우리는 ground truth, 즉 정답을 알고 있습니다. 결국, 방금 설명된 forward propagation의 output이 정답과 얼마나 가까운지 측정할 수 있다는 뜻이기도 하죠.
+&#160;이제 $ Z^{[1]} $ 을 activation function(활성화 함수)에 통과시키면 첫번째 layer의 아웃풋을 얻을 수 있습니다. 이를 수식으로 표현하면 $ a^{[1]} = g(Z^{[1]}) $ 입니다. 
 
-> &#160;참고. 이렇게 학습 데이터셋의 정답을 알고 있는 형태의 머신 러닝을 'Supervised Learning'이라고 합니다.
+&#160;첫 layer의 계산을 마쳤습니다. 한가지 주목할 점은, 행렬 곱셈을 사용하였기에 layer의 모든 노드의 계산을 한번에 진행할 수 있었다는 점입니다.
 
-&#160; forward propagation으로부터 출력된 값을 $ \hat{y} $ 이라고 하고, ground truth 값을 $ y $ 이라고 합시다. 이 때, 우리는 아래과 같은 공식으로 loss를 구합니다.
+&#160;이후 layer에 대해서도 똑같습니다. 임의의 layer $ N $ 의 연산을 일반화하면 아래와 같습니다. 
 
-$$ L(\hat{y}, y) = -(y\log(\hat{y}) + (1-y)\log(1-\hat{y})) $$
+$$ Z^{[n]} = W^{[n]} a^{[n-1]} + b^{[1]} $$
 
-&#160;위 수식을 살펴보면, ground truth($ y $)가 1인 데이터에 대해서는, 수식의 오른쪽 부분은 0이 되고 왼쪽 부분만 살아남게 되어 loss는 $ -\log(\hat{y}) $ 이 됩니다. 이때, 로그함수의 모양을 생각해 보면 $ \hat{y} $가 작을수록 loss는 커지게 됩니다. 즉 $ y $가 1일때는  $ \hat{y} $도 1에 가까워야 loss(오차)가 작아진다는 것을 잘 나타내므로 이 수식이 말이 되는 것을 확인할 수 있죠. $ y $가 0일 때를 생각해 봐도 이 수식의 타당성을 이해 할 수 있습니다.
+$$ a^{[n]} = g(Z^{[n]}) $$
 
-&#160;(사진12)를 봅시다. 연예인A 데이터를 neural network에 forward propagate시킨 모습입니다. Neural network는 0.873이라는 $ \hat{y} $ 값('호감'일 확률)을 출력했습니다. 연예인A는 '호감'에 속하므로 $ y $값은 1이며, 위 수식에 넣어 계산한 loss는 -0.059 가 됩니다. 나름 잘(?) 맞췄으므로 상당히 작은 loss가 계산된 것을 확인하실 수 있습니다.
+$ a^{[n]} $ 는 $ n $ 번째 layer의 아웃풋을 의미합니다. 일반화를 위해 input data $ X $ 를 $ a^{0} $ 으로 정의하였습니다. <br>
+$ W^{[n]} $ 는 $ n $ 번째 layer의 가중치 행렬입니다. ($ n-1 $ 번과 $ n $ 번 layer를 연결하는 선분으로 생각해주세요.) <br>
+$ Z^{[n]} $ 는 $ n $ 번째 layer에서 선형 연산(가중치합)까지 수행한 결과물이며, $ g $ 는 활성화함수(activation function)을 의미합니다.
 
-&#160;그렇다면 이렇게 forward-propagation을 통해 loss를 구하는 것과, weight를 업데이트하는 '학습'과는 어떤 관계가 있는 걸까요? [다음 단원](#7-gradient와-back-propagation)에서는 loss가 계산된 이후 어떻게 weight를 update되는 것인지 이해해 보도록 하겠습니다.
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/TempH.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (그림17) 전체 layer의 가중치 및 데이터 행렬 크기
+  </figcaption>
+</figure>
+
+&#160;전체 layer를 통과하면 1행 4열짜리 $ \hat{y} $ 벡터를 얻게 됩니다. 우리의 데이터셋에 적용하면, 4명 연예인 각각에 대한 호감으로 판단할 확률을 예측한 것입니다. 한 연예인당 예측값이 '호감 확률' 한 가지이므로 마지막 output layer의 노드는 한 개입니다.
+
+**행렬의 사이즈를 계산하는 Tip**
+
+&#160;(그림17)을 보면 네트워크 구조에 따른 가중치 행렬의 크기와 데이터 행렬의 크기가 표현되어 있습니다. 이러한 행렬의 크기(행의 수, 열의 수)는 어떻게 파악한 것일까요? 
+
+- 데이터 행렬($ a $) 의 열의 수는 항상 'iteration에 입력 벡터의 샘플의 수'입니다. 우리는 연예인 4명을 iteration에 사용했으므로 전체 네트워크에서 $ a $ 의 열의 수는 항상 4인 것을 확인할 수 있습니다.
+
+-  데이터 행렬($ a $)의 행의 수는 해당 layer의 노드의 개수입니다. 예를 들어 1번 layer의 노드는 5개였으므로 $ a^{[1]} $ 의 행은 5개입니다.
+
+-  가중치 행렬 ($ W $)의 열의 수는 "이전 layer"의 노드의 개수입니다.
+
+- 가중치 행렬 ($ W $)의 행의 수는 "현재 layer"의 노드의 개수입니다.
+
+**Bias를 사용하는 이유**
+
+&#160; (bias가 있는 이유)
 
 <br><br>
 

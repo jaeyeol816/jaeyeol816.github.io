@@ -13,7 +13,7 @@ use_math: true
 
 <br>
 
-# 목차
+## 목차
 
 순서대로 읽으시는 것을 추천드립니다!
 1. '인공 신경망'과 '신경망' &#160;&#160; [👉바로가기](#1-인공-신경망과-사람의-신경망)
@@ -296,13 +296,27 @@ $ Z^{[n]} $ 는 $ n $ 번째 layer에서 선형 연산(가중치합)까지 수�
 
 **Bias를 사용하는 이유**
 
-&#160; (bias가 있는 이유)
+&#160; 각 $ n $ 번째 layer마다 layer내 뉴런의 개수 만큼의 크기를 갖는 bias 벡터 $ b^{[n]} $ 가 존재합니다. 단순히 가중합을 구해서 비선형 activation에 넘겨주는 것이 아니라, 가중합에 bias가 더해져서 $ W^{[n]}a^{[n-1]} + b $ 형태가 만들어진 후 넘겨지죠. Bias 벡터도 weight 행렬과 마찬가지로 학습이 진행되며 값이 업데이트됩니다. Weight 뿐 아니라 bias를 사용하는 이유는 무엇일까요?
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/TempI.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (그림18) 상수항을 추가함으로써 얻는 효과
+  </figcaption>
+</figure>
+
+
+&#160;(그림18)의 왼쪽은 $ y = wx $의 그래프입니다. 표현할 수 있는 대응관계는 $ w $ 값에 따라 기울기만 다르고 원점을 지나는 직선 형태입니다. 오른쪽은 $ y = wx + b $의 그래프입니다. 원점을 지나지 않는 그래프도 표현할 수 있게 되었죠. <br>
+&#160;이처럼 선형결합에 상수항을 추가하므로써 원점을 지나지 않는 $ x $ 와 $ y $ 의 대응 관계도 표현할 수 있습니다. 결과적으로 각각의 노드에서 decision boundary를 더 정확하게 표현할 수 있게 된다는 효과가 있습니다.
+
+
 
 <br><br>
 
-## 7. Gradient와 Optimization
+## 7. Gradient Descent와 Optimization
 
-&#160;[5단원](#5-학습이란-weight를-조정해-가는-과정이다)에서 딥러닝에서 '학습'이란 loss를 최소화 하기 위해 weight를 업데이트해 가는 과정이라고 배웠습니다. 그렇다면 weight는 어떻게 업데이트를 하는 것일까요? 이 방법을 배우기 위해서 우선 weight에 대한 loss의 그래프를 살펴볼 필요가 있습니다.
+&#160;[5단원]()에서 딥러닝에서 '학습'이란 loss를 최소화 하기 위해 파라미터를 업데이트해 가는 과정이라고 배웠습니다. 이렇게 모델이 최선의 아웃풋을 출력하도록 만드는 것을, 우리는 모델을 최적화(optimize)한다고 합니다. 그렇다면 optimize하기 위해서 파라미터는 어떻게 업데이트를 하는 것일까요? 이 방법을 배우기 위해 우선 weight에 대한 loss의 그래프가 있다고 가정해 봅시다.
 
 **Convex Function**
 
@@ -310,108 +324,93 @@ $ Z^{[n]} $ 는 $ n $ 번째 layer에서 선형 연산(가중치합)까지 수�
   <img src="/assets/images/deep1/Picture13.png"
         style=""> 
   <figcaption style="text-align:center; font-size:13px; color:#808080">
-    (사진13) weight에 대한 loss의 그래프
+    (그림19) weight에 대한 loss의 그래프
   </figcaption>
 </figure>
 
 &#160;볼록 함수(convex function)에 대해 들어 보셨나요? 우리가 가장 잘 convex function은 이차함수 입니다. 함수가 최솟값을 가지게 하는 특정 x값이 존재하는 것이 특징입니다.
 
 &#160;우리의 목표는 loss를 최소로 하는 weight를 찾는 것입니다. Weight에 대한 loss의 함수가 (사진13)과 같이 convex function이라고 해 봅시다.<br>
-&#160;그렇다면 (사진13)의 왼쪽 그림인 2차원 함수의 경우 loss값이 최소가 되도록 하는 weight값이 존재하게 되며, (사진13)의 오른쪽 그림인 3차원 함수의 경우 loss값이 최소가 되도록 하는 weight값 쌍이 존재하게 됩니다.
+&#160;그렇다면 (사진13)의 왼쪽 그림인 2차원 함수의 경우 가장 볼록한 지점에 loss값이 최소가 되도록 하는 weight값이 존재하게 되며, (사진13)의 오른쪽 그림인 3차원 함수의 경우에도 가장 볼록한 지점에 loss값이 최소가 되도록 하는 weight값 쌍이 존재하게 됩니다.
 
-**Optimization 과정**
+**파라미터를 움직이기**
 
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/deep1/Picture14.png"
         style=""> 
   <figcaption style="text-align:center; font-size:13px; color:#808080">
-    (사진14) w값에 기울기를 뺌으로써 optimal point의 w값으로 이동하도록 하는 과정
+    (그림20) w값에 기울기를 뺌으로써 optimal point의 w값으로 이동하도록 하는 과정
   </figcaption>
 </figure>
 
-
 &#160;그렇다면 loss가 최소가 되기 위해서는 weight를 어떻게 움직이는 것이 좋을까요? (사진14)의 왼쪽 2차원 그래프를 봅시다. $ w_1 $ 이 0일 때 loss가 최솟값이 되죠. $ w_1 $이 0보다 작은 상황이면, $ w_1 $ 값을 오른쪽(더 커지게)으로 업데이트하고 $ w_1 $ 이 0보다 큰 상황이라면 왼쪽으로(더 작아지게) 업데이트하면 되겠죠? 
 
-&#160;이것을 구현하려면 어떻게 하면 될까요? "기울기(의 상수곱)를 빼는 과정"을 통해 $ w_1 $ 값을 볼록점의 $ w_1 $ 값으로 모이게 할 수 있습니다. 왜 기울기를 빼는 것이 $ w_1 $ 을 볼록점의 $ w_1 $ 값(위 그림에서 0)으로 모이게 하는지 알아봅시다. <br>
+&#160;이것을 구현하려면 어떻게 하면 될까요? "기울기(의 상수곱)를 빼는 과정"을 통해 $ w_1 $ 값을 볼록점의 $ w_1 $ 값으로 모이게 할 수 있습니다. <br>
 &#160;$ w_1 $ 값이 0보다 작다면, 양수를 더해야 0으로 모이게 할 수 있습니다. 이때 $ w_1 $ 에서 loss함수의 기울기가 음수이기 때문에 이 '음수 상태인 기울기'를 빼는 것이 양수를 더하는 것과 같은 효과를 얻습니다. 
 &#160;$ w_1 $ 값이 0보다 크다면, 양수를 빼야 0으로 모이게 할 수 있습니다. 이때 $ w_1 $ 에서 loss함수의 기울기가 양수기 때문에 이 기울기를 빼는 것으로 $ w_1 $ 값을 0(볼록점의 $ w_1 $ 값)으로 모이게 할 수 있습니다.
 
-&#160;이렇게 loss가 최소가 되도록 weight값을 옮겨 가는 과정을 "optimization" 이라고 하며, 그 때의 좌표를 "optimal point"라고 합니다.
+&#160;이렇게 loss가 최소가 되도록 하는 파라미터 값들을 "optimal point"라고 합니다.
 
 &#160;(사진14)의 왼쪽 그림은 neural network에서 weight가 하나일 때 loss의 그래프를 나타낸 것이라면, (사진14)의 오른쪽 그림은 weight가 두 개일 때 loss의 그래프를 나타낸 것입니다. 이 때 $ w_1 $ 도 optimal point으로 옮기고 $ w_2 $ 도 optimal point으로 옮길 필요성이 있습니다. $ w_1 $ 값도 기울기를 빼고 $ w_2 $ 도 마찬가지로 기울기를 빼는 과정을 통해 $ w_1 $ 와 $ w_2 $ 를 각각 optimal point으로 수렴시키면 됩니다.
 
 &#160;실제로 neural network에서의 weight의 개수는 한개도 아니고 두개도 아닙니다. 각 layer마다, 그리고 각 unit마다 여러 개의 weight가 존재하며, 때로는 수천개가 되기도 합니다. 2차원, 3차원의 그래프는 그릴 수 있지만 수천 차원의 그래프는 그릴 수 없습니다. 하지만 그 때도 이렇게 각 weight마다 "본인에 대한 loss의 변화율"을 뺌으로써 optimize를 수행할 수 있다는 것은 똑같이 적용됩니다.
 
-**Local Optima**
+**Gradient**
 
-&#160;'기울기를 빼는' optimization과정을 아무때나 할 수 없습니다. 우리가 처음에 전제로 했던 볼록함수(convex function)여야 한다는 것이 필요조건입니다. 이렇게 기울기를 빼가면서 optimization을 했더니 loss의 전체 최솟값이 아닌 부분 최솟값에 수렴하게 만들 위험도 있습니다. 아래 (사진15)처럼 말이죠. 이렇게 함수 전체 구간에서의 최솟값이 아닌 부분 구간에서의 최솟값으로 optimize되는 현상을 "local optima problem"이라고 합니다.
+&#160;특정 weight에 대한 loss function의 기울기를 'gradient'라는 용어로 지칭합니다. Gradient는 해당 변수에 대한 편미분으로 표현되죠. 예를 들어 함수 $ f(x,y) $ 에서 $ f $ 의 기울기를 구하고 싶을 때, $ x $ 에 대한 $ f $ 의 변화율($ {∂f} \over {∂x} $), $ y $ 에 대한 $ f $ 의 변화율($ {∂f} \over {∂y} $)을 구할 수 있죠. 딥러닝에서로 치환해 보면 $ x $ 와 $ y $ 는 모델을 구성하는 파라미터이며 $ f $ 는 $ x, y $에 대한 loss 로 볼 수 있습니다. 하지만 6단원에서 보았듯이, 딥러닝의 neural network에 파라미터가 두개는 아니며 수많은 개수가 존재합니다. $ W^{[1]}, W^{[2]}, W^{[3]}, ... $ 이런 식으로 가중치 행렬이 있으며 각 행렬에는 해당 layer의 가중치들이 포진되어 있죠. 여러 layer로 이루어진 neural network에서 각 파라미터의 편미분값을 어떻게 구하는지는 다음 포스팅에서 설명하겠습니다. 결과적으로, 우리는 매 iteration마다 이 수많은 파라미터에다가 '해당 파라미터의 gradient에 일정 learning rate를 곱한 값'을 빼주는 작업을 수행하여 모델을 optimize(최적화)해 나갑니다. 
+
+**Gradient Descent(경사하강법)**
+
+<figure style="display:block; text-align:center;">
+  <img src="/assets/images/deep1/TempK.png"
+        style=""> 
+  <figcaption style="text-align:center; font-size:13px; color:#808080">
+    (그림21) Gradient Descent
+  </figcaption>
+</figure>
+
+$$ w \leftarrow w - \alpha { ∂Loss \over ∂w } $$
+
+
+&#160;위 수식과 같이 매 iteration마다 파라미터의 gradient를 차감해 주는 과정을 gradient descent라고 합니다. 차감되는 변화율 앞에 붙은 $ \alpha $ 는 learning rate(학습률)로써, 한꺼번에 얼마나 내려갈지를 결정합니다. Learning rate 값을 키운다면 더 적은 iteration에 걸쳐 빠르게 최적화 할수 있지만, 정교한 방향으로 움직이지 못하게 되며 마지막 optimal point에 가까워졌을때 진동하게 될 가능성이 커집니다.
+
+&#160;Gradient descent를 다르게 해석하면 파라미터에 대한 loss의 그래프에서, 그때 그때 시점에서 가장 가파른 기울기로 내려간다고 생각해 볼 수 있습니다. (그림21)에서 가장 가파른 경사로만 스키를 타는 사람처럼, 전체적인 과정을 고려하지 않고 해당 시점(해당 iteration)에서의 최선의 방향으로 최적화를 진행해 나가는 것이죠. 
+
+**Local Minimum**
+
+&#160;이와 같은 gradient descent 과정을 통해 optimal point를 찾기 위해서는, 우리가 처음에 전제로 했던 볼록함수(convex function)여야 한다는 것이 필요조건입니다. 이렇게 그때 그때 가장 가파른 길로 내려갔더니 전체 구간에서의 최솟값(global minimum)이 아닌 부분 구간에서의 최솟값(local minimum)에 수렴하게 만들 위험도 있습니다. 아래 (그림22)처럼 말이죠. 이렇게 함수 전체 구간에서의 최솟값이 아닌 부분 구간에서의 최솟값으로 optimize되는 현상을 "local optima problem"이라고 합니다.
 
 <figure style="display:block; text-align:center;">
   <img src="/assets/images/deep1/Picture15.png"
         style=""> 
   <figcaption style="text-align:center; font-size:13px; color:#808080">
-    (사진15) Local Optimum과 Global Optimum
+    (그림22) Local Minimum과 Global Minimum
   </figcaption>
 </figure>
 
-&#160;하지만 현재로써 걱정할 필요는 없습니다. weight의 개수가 많아지면 결국에는 convex point가 하나 존재하게 된다는 것이 알려져 있기 때문이죠.
-
-
-**Back-propagation (역전파)**
-
-&#160;그렇다면 neural network의 각각의 weight에 대한 loss의 변화율은 어떻게 구하면 될까요? 
-
-&#160;Neural network의 구조부터 생각해 봅시다. weight는 layer의 unit마다 존재합니다. 이 상황에서 모든 layer의 weight들 각각을 "자기 자신에 대한 loss의 변화율"을 구해야 하는 것이 우리의 과제입니다. "특정 weight에 대한 loss의 변화율"을 이제부터 "gradient"라는 용어로 부르기로 하죠.
+&#160;하지만 현재로써는 이 문제를 고려할 필요가 없다는 것이 중론입니다. Local minimum을 찾지 못하더라도, 딥러닝에서의 weight처럼 변수의 개수가 충분히 많아진다면 성능이 좋게 나오는 경우가 많기 때문입니다.
 
 <figure style="display:block; text-align:center;">
-  <img src="/assets/images/deep1/Picture16.png"
+  <img src="/assets/images/deep1/TempJ.png"
         style=""> 
   <figcaption style="text-align:center; font-size:13px; color:#808080">
-    (사진16) Back propagation의 이해
+    (그림23) 학습 횟수에 따른 gradient norm과 error rate
   </figcaption>
 </figure>
 
-&#160;각 weight의 gradient를 구하기 위해 우리는 마지막 layer의 weight부터 "역방향"으로 미분을 해 나갑니다. 여기서 핵심은 "합성함수의 미분" 입니다. <br>
-&#160;(사진16)과 같은 neural network를 합성 함수라고 생각해봐요. 인풋 데이터를 주었을 때 주황색 unit 함수, 노란색 unit 함수, 초록색 unit 함수, 파란색 unit 함수 순서대로 거친 후 ground truth와 비교하는 함수를 거쳐 loss가 계산된다고 해 봅시다 (실제로는 색칠된 unit 뿐 아니라 모든 unit을 거치는데 이해를 위해 색칠한 unit에 대해서만 언급하겠습니다.) 
+&#160;위 그래프를 보시면 iteration이 반복할 때 gradient norm이 증가하지만(실제 optimal point와 멀어지고 있다는 것을 의미합니다) error rate는 감소하는 것을 확인하실 수 있습니다. (모델이 우리가 시키는 task를 잘 수행하고 있다는 것을 의미합니다.)
 
-&#160;첫 번째로, 합성함수에서 가장 마지막 함수라고 할 수 있는 loss function의 변화율을 구합니다. Loss function은 neural network의 output를 loss로 매핑하는 함수이며, 이 함수의 미분을 통해 "output에 대한 loss"의 변화율, 즉 $ dLoss \over dOutput $ 이라고 할 수 있습니다.
-
-&#160;그 다음 단계는, 파란색 unit의 weight인 $ w_🍎 $ 에 대한 loss의 변화율을 구하는 것이 목표입니다. 파란색 unit에 존재하는 linear함수와 activation함수는 미분이 가능하므로 $ dOutput \over dw_🍎 $ 는 충분히 한번에 구할 수 있습니다. 하지만 우리가 구하고 싶은 것은 $ dLoss \over dw_🍎 $ 입니다. 이것은 어떻게 구할 수 있을까요? 이전 단계(보라색)에서 구했던 $ dLoss \over dOutput $ 에다가 이번 단계(파란색)에서 구한 $ dOutput \over dw_🍎 $ 를 곱해주면 됩니다!! (합성함수의 미분)
-
-&#160; 다음 단계는, 초록색 unit의 weight인 $ w_🍊 $ 에 대한 loss의 변화율인 $ dLoss \over dw_🍊 $ 를 구하는 것입니다. 마찬가지로 합성함수 미분의 원리를 적용하면, 이전 단계에서 구한 $ dLoss \over dw_🍎 $ 에다가 현재 단계의 함수를 미분하여 구할 수 있는 $ dw_🍎 \over dw_🍊 $ 를 곱함으로써 $ dLoss \over dw_🍊 $ 를 계산할 수 있습니다. 이처럼 layer를 역방향으로 거슬러 올라가면서 이 함성함수 미분을 실시하면, 차례대로 모든 unit의 weight에 대한 loss의 변화율들을 구해 나갈 수 있습니다.
-
-
-&#160;[6단원](#6-forward-propagation과-loss)에서 등장했던 "forward propagation"은 맨 앞 layer부터 연산을 진행했다면, 변화율을 구하는 과정은 마지막 layer부터 진행되기 때문에 "back propagation"이라는 용어를 사용하고 있습니다.
-
-**Gradient Descent (경사하강법) 그리고 Parameter**
-
-&#160;위 내용에서 설명이 이어집니다. 이렇게 각 weight의 gradient를 구했으면, optimization을 하기 위해 기존 weight값에서 gradient를 빼 주면 됩니다. (왜 이런 과정을 거치는지는 위의 "**Optimization 과정**" 단원에서 설명하였습니다.)
-
-<figure style="display:block; text-align:center;">
-  <img src="/assets/images/deep1/Picture17.png"
-        style=""> 
-  <figcaption style="text-align:center; font-size:13px; color:#808080">
-    (사진17) Gradient Descent
-  </figcaption>
-</figure>
-
-&#160;하지만 weight에서 gradient를 그냥 빼지는 않습니다. 우리의 목표는 optimal point에 weight가 수렴하게 만드는 것인데, gradient값이 크면 optimal point를 지나칠 수 있고, 작으면 너무 천천히 다가가게 될 수도 있기 때문입니다. 따라서 우리는 적절한 learning rate ((사진17)에서의 $ \alpha $) 를 gradient에 곱한 후 뺍니다. 
-
-&#160;이처럼 neural network상에 존재하는 다양한 weight들에 대해 gradient에 learning rate를 곱한 값을 빼 줌으로써 업데이트를 해나가는 과정을 gradient descent라고 합니다. 주의해야 할 것은, weight 뿐 아니라 각 unit에 존재하는 bias도 마찬가지로 똑같은 gradient descent 과정이 적용되어 업데이트되어갑니다. 이처럼 학습의 대상이 되는 변수들을 "parameter"이라고 합니다.
-
-&#160;이번 단원에서 배운 내용은 결국 "gradient descent를 수행함으로써 딥러닝 모델을 optimize한다" 라고 정리할 수 있어요.
-
-<br><br>
 
 ## 8. 정리하자면..
 
 - 우리의 목표는 neural network가 정확한 예측값을 출력해 내도록 학습 시키는 것이며, '학습'은 neural network상에 존재하는 parameter를 업데이트함으로써 진행됩니다. 
 - 데이터셋을 neural network에 집어넣어 예측값을 얻고, ground truth와 예측값을 비교하여 loss를 얻는 과정을 forward-propagation이라고 합니다.
-- 각 parameter들에 대한 loss의 변화율인 gradient들을 구한 다음 parameter에 gradient에 learning rate를 곱한 값을 빼 parameter값을 업데이트합니다. 이것을 back-propagation이라고 합니다.
+- 각 parameter들에 대한 loss의 변화율인 gradient들을 구한 다음 parameter에 gradient에 learning rate를 곱한 값을 빼 parameter값을 업데이트합니다. (Optimization)
+- 이를 위해 여러 layer에 걸쳐 (loss에서 첫번째 layer 방향으로) gradient를 계산하는 방법을 back-propagation이라고 하는데, 다음 포스팅에서 설명하도록 하겠습니다.
 - Forward-propagation, loss 계산, back-propagation을 모두 거치면 1회의 iteration이 일어났다고 할 수 있습니다.
-- Iteration 과정이 수천 번, 수만 번, 또는 그 이상으로 반복시켜 학습을 진행시킵니다. 점차 optimization이 진행되어 점점 loss가 작은 예측값을 출력하는 딥러닝 모델이 만들어집니다.
+- Iteration 과정이 수천 번, 수만 번, 또는 그 이상으로 반복시켜 학습을 진행시킵니다. 점점 loss가 작은 예측값을 출력하는 딥러닝 모델이 만들어집니다.
 
-> 이상으로 이번 포스팅을 마치겠습니다. 내용이 길었지만 끝까지 읽어주셔서 감사합니다^^
+> 이상으로 이번 포스팅을 마치겠습니다. 끝까지 읽어주셔서 감사합니다^^
 
 
 <br><br><br>
@@ -425,3 +424,5 @@ $ Z^{[n]} $ 는 $ n $ 번째 layer에서 선형 연산(가중치합)까지 수�
 [사진13(1)](https://ko.wikipedia.org/wiki/%EC%9D%B4%EC%B0%A8_%ED%95%A8%EC%88%98)<br>
 [사진13(2)](https://www.sfu.ca/~ssurjano/spheref.html)<br>
 [사진15](https://vitalflux.com/local-global-maxima-minima-explained-examples/)
+
+[그림22](https://easyai.tech/en/ai-definition/gradient-descent/)

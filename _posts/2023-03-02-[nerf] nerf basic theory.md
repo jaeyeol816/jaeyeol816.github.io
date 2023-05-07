@@ -3,7 +3,6 @@ title:  "[NeRF][이론] Neural Radiance Fields for View Synthesis 개념 설명�
 categories:
   - neural_representation
 use_math: true
-layout: default
 comments: true
 ---
 

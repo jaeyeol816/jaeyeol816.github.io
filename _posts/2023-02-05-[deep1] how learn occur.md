@@ -3,7 +3,6 @@ title:  "[딥러닝1] 딥러닝에서 학습은 어떻게 일어날까? (딥러�
 categories:
   - deep_learning
 use_math: true
-layout: default
 comments: true
 ---
 
@@ -426,7 +425,6 @@ $$ w \leftarrow w - \alpha { ∂Loss \over ∂w } $$
 [사진13(1)](https://ko.wikipedia.org/wiki/%EC%9D%B4%EC%B0%A8_%ED%95%A8%EC%88%98)<br>
 [사진13(2)](https://www.sfu.ca/~ssurjano/spheref.html)<br>
 [사진15](https://vitalflux.com/local-global-maxima-minima-explained-examples/)
-
 [그림22](https://easyai.tech/en/ai-definition/gradient-descent/)
 
 

@@ -105,7 +105,7 @@ analytics:
 # Site Author
 author:
   name             : "최재열"
-  avatar           : /assets/images/IMG_6212.jpeg
+  avatar           : "/assets/images/IMG_6212.jpeg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "Sungkyunkwan Univ. Computer Education"
   location         : "Seoul"
   email            : 

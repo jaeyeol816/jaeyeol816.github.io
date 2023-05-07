@@ -3,6 +3,8 @@ title:  "[NeRF][이론] Neural Radiance Fields for View Synthesis 개념 설명�
 categories:
   - neural_representation
 use_math: true
+layout: default
+comments: true
 ---
 
 ## 들어가기에 앞서..
@@ -466,3 +468,7 @@ $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p
 [사진11](https://youtu.be/FSG5bCkNWWo) <br>
 [사진13]() <br>
 [사진14](https://youtu.be/FSG5bCkNWWo) <br>
+
+{%- if site.disqus.shortname -%}
+	{%- include disqus.html -%}
+{%- endif -%}

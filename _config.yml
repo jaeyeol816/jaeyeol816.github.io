@@ -290,7 +290,13 @@ defaults:
       layout: single
       author_profile: true
       read_time: true
-      comments: # true
+      comments: true
       share: true
       related: true
       sidebar_main: true
+
+# 댓글 관련
+comments:
+  provider: disqus
+disqus:
+  shortname: friendly_computer_science

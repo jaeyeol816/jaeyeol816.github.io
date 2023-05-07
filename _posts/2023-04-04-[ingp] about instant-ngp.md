@@ -3,6 +3,7 @@ title:  "[Instant-NGP][이론] Instant Neural Graphics Primitives 개념 설명 
 categories:
   - neural_representation
 use_math: true
+comments: true
 ---
 
 
@@ -332,3 +333,8 @@ $ N_{min} $과 $ N_{max} $가 주어졌으면 다음과 같이 $ l $번째 레�
 [그림7](https://arxiv.org/abs/2112.05131) <br>
 [그림11](https://arxiv.org/abs/2201.05989) <br>
 [그림16](https://arxiv.org/abs/2201.05989) <br>
+
+
+{%- if site.disqus.shortname -%}
+	{%- include disqus.html -%}
+{%- endif -%}

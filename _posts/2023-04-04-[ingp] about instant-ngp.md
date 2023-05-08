@@ -4,6 +4,8 @@ categories:
   - neural_representation
 use_math: true
 comments: true
+toc: true
+toc_sticky: true
 ---
 
 

@@ -4,6 +4,8 @@ categories:
   - deep_learning
 use_math: true
 comments: true
+toc: true
+toc_sticky: true
 ---
 
 ## 들어가기에 앞서...

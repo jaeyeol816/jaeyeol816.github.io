@@ -1,5 +1,5 @@
 ---
-title: "NeRF"
+title: "Implicit Neural Representation"
 layout: archive
 permalink: categories/neural_representation
 author_profile: true

@@ -468,6 +468,7 @@ $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p
 [사진13]() <br>
 [사진14](https://youtu.be/FSG5bCkNWWo) <br>
 
+
 {%- if site.disqus.shortname -%}
 	{%- include disqus.html -%}
 {%- endif -%}

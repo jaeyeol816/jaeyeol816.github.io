@@ -22,15 +22,15 @@ toc_sticky: true
 
 순서대로 읽으시는 것을 권장드립니다!
 
-1) Instant-NGP 소개 <br>
-2) NeRF와 positional encoding <br>
-3) Parametric Encoding <br>
-4) Dense & Sparse Parametric Encoding <br>
-5) Parametric Encoding in Instant-NGP <br>
-6) Multiresolution Hash Encoding <br> 
-7) Hyperparameters <br>
-8) 구현상의 특징 <br>
-9) 결과 비교 및 정리 <br>
+1. Instant-NGP 소개 &#160;&#160; [👉바로가기](#1-instant-ngp-소개) <br>
+2. NeRF와 positional encoding &#160;&#160; [👉바로가기](#2-nerf와-positional-encoding) <br>
+3. Parametric Encoding  &#160;&#160; [👉바로가기](#3-parametric-encoding)  <br>
+4. Dense & Sparse Parametric Encoding &#160;&#160; [👉바로가기](#4-dense--sparse-parametric-encoding) <br>
+5. Parametric Encoding in Instant-NGP &#160;&#160; [👉바로가기](#5-parametric-encoding-in-instant-ngp) <br>
+6. Multiresolution Hash Encoding &#160;&#160; [👉바로가기](#6-multiresolution-hash-encoding) <br> 
+7. Hyperparameters &#160;&#160; [👉바로가기](#7-hyperparameters) <br>
+8. 구현상의 특징 &#160;&#160;[👉바로가기](#8-구현상의-특징) <br>
+9. 결과 비교 및 결론 &#160;&#160; [👉바로가기](#9-결과-비교-및-결론) <br>
 
 
 <br>

@@ -178,7 +178,7 @@ NeRF가 실제로 어떤 분야에서 어떻게 활용될 수 있을까요?
 
 &#160;NeRF에서는 volume rendering을 통해 3차원 공간의 ray상의 점들을 적분하여 2차원상의 픽셀의 색상을 결정합니다. (이때 주의할 것은, 현실적으로 연속적인 모든 점을 적분할 수 없으므로, ray상의 일부 particle들을 샘플링 하여 더한다는 것입니다.) 투과된 픽셀의 색상을 알기 위해서는 R, G, B 각각 ray상의 particle들의 색상을 더하여 얻을 수 있습니다. 이 때, density가 높은 particle은 더 많은 비중을 두고 density가 낮은 particle들은 더 낮은 비중을 주어 더하죠. 이 뿐만 아닙니다. 특정 particle 앞에 많은 particle이 가로막고 있다면 렌더링 했을 때의 해당 particle의 영향력은 감소할 수 밖에 없습니다. 따라서 픽셀 앞에 있는 particle들의 density들을 종합하여 '누적된 투과율' 이라는 것을 추가적으로 곱해 줍니다. 
 
-&#160;지금까지 ray의 volume rendering을 통해 렌더링된 이미지 내 픽셀 하나 하나의 색상값을 계산해내는 대략적인 과정을 알아보았습니다. 수식을 비롯한 더 자세한 내용은 hierarchical volume sampling을 배운 후 [8단원]() 에서 이어서 설명드리도록 하겠습니다.
+&#160;지금까지 ray의 volume rendering을 통해 렌더링된 이미지 내 픽셀 하나 하나의 색상값을 계산해내는 대략적인 과정을 알아보았습니다. 수식을 비롯한 더 자세한 내용은 hierarchical volume sampling을 배운 후 [8단원](#8-nerf-volume-rendering) 에서 이어서 설명드리도록 하겠습니다.
 
 <br><br>
 
@@ -200,7 +200,7 @@ NeRF가 실제로 어떤 분야에서 어떻게 활용될 수 있을까요?
 
 **2단계. Ray상에서 point들을 샘플링하기**
 
-&#160;ray상의 near bound와 far bound 범위 사이에서 $ N $ 개의 point를 샘플링 합니다. (사실 ray 전체에 걸쳐 샘플링 된 후 물체가 있는 부분에 대해 집중적으로 한번 더 샘플링 합니다. 자세한 설명은 [5단원]()을 참고해주세요.)
+&#160;ray상의 near bound와 far bound 범위 사이에서 $ N $ 개의 point를 샘플링 합니다. (사실 ray 전체에 걸쳐 샘플링 된 후 물체가 있는 부분에 대해 집중적으로 한번 더 샘플링 합니다. 자세한 설명은 [5단원](#5-hierarchical-volume-sampling)을 참고해주세요.)
 
 **3단계. 샘플링된 모든 점에 대해 각각 MLP에 query하기**
 
@@ -208,11 +208,11 @@ NeRF가 실제로 어떤 분야에서 어떻게 활용될 수 있을까요?
 
 **4단계. Volume rendering을 통해 예측된 색상값 계산하기**
 
-&#160;Ray의 각 point별 color, density값을 가지고 고유의 색상값을 계산해 냅니다. 이 값은 ray에 대한 MLP의 예측값입니다. (자세한 설명은 [8단원]()을 참고해주세요.) Volume rendering 과정은 미분가능하기 때문에 loss에 대한 gradient를 계산하는데 방해가 되지 않습니다. 
+&#160;Ray의 각 point별 color, density값을 가지고 고유의 색상값을 계산해 냅니다. 이 값은 ray에 대한 MLP의 예측값입니다. (자세한 설명은 [8단원](#8-nerf-volume-rendering)을 참고해주세요.) Volume rendering 과정은 미분가능하기 때문에 loss에 대한 gradient를 계산하는데 방해가 되지 않습니다. 
 
 **5단계. Loss 계산하기**
 
-&#160;4단계에서 구한 예측값과 샘플 이미지의 실제 색상값(ground truth) 사이의 오차(loss)를 구합니다. Loss로는 squared error를 사용합니다. (자세한 설명은 [9단원]()을 참고해주세요.)
+&#160;4단계에서 구한 예측값과 샘플 이미지의 실제 색상값(ground truth) 사이의 오차(loss)를 구합니다. Loss로는 squared error를 사용합니다. (자세한 설명은 [9단원](#9-loss-computation)을 참고해주세요.)
 
 **6단계. Back-propagation**
 
@@ -327,9 +327,9 @@ $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p
 
 &#160;주목할 포인트는 3D point의 위치($ x $), 방향($ d $) 벡터가 MLP에 입력되는 타이밍과, 색상(RGB)와 밀도($ \sigma $)벡터의 출력 타이밍입니다. Location($ x $)만 갖고 layer를 투과하여 density($ \sigma $)가 예측되며, density가 출력될 때 direction($ d $) 정보까지 추가적으로 입력되어 색상(RGB) 이 예측됩니다. 이는 [2단원](#2-nerf-개요)에서 설명한 NeRF의 "density는 점의 위치에 따라 결정되고 color는 점의 위치와 바라보는 방향에 따라 결정된다"는 성질을 반영하고 있습니다.
 
-&#160;Layer당 unit 수는 마지막 layer를 제외하고 256개이며, [DeepSDF 아키텍처]()를 따르기 때문에 5번째 hidden layer에서 skip connection을 위해 한번 더 위치 벡터($ x $)을 대입합니다 (exploding gradient problem 해결을 위해서).
+&#160;Layer당 unit 수는 마지막 layer를 제외하고 256개이며, [DeepSDF 아키텍처](https://arxiv.org/abs/1901.05103)를 따르기 때문에 5번째 hidden layer에서 skip connection을 위해 한번 더 위치 벡터($ x $)을 대입합니다 (exploding gradient problem 해결을 위해서).
 
-&#160;4096개의 ray가 하나의 batch를 이룹니다. Ray상에서 샘플링은 [5단원]()에서 배웠던 hierarchical volume sampling을 사용하며 coarse network를 위해 64개의 point를($ N_c = 64 $), fine network를 위해 128개를 추가적으로 샘플링하여 192개의 point를 사용합니다($ N_f = 128 $). 따라서 한 ray당 256번의 query가 일어난다고 할 수 있습니다.
+&#160;4096개의 ray가 하나의 batch를 이룹니다. Ray상에서 샘플링은 [5단원](#5-hierarchical-volume-sampling)에서 배웠던 hierarchical volume sampling을 사용하며 coarse network를 위해 64개의 point를($ N_c = 64 $), fine network를 위해 128개를 추가적으로 샘플링하여 192개의 point를 사용합니다($ N_f = 128 $). 따라서 한 ray당 256번의 query가 일어난다고 할 수 있습니다.
 
 &#160;Optimizing 알고리즘으로는 adam optimizer를 사용하며($ \beta_1 = 0.9, \beta_2 = 0.999 $), learning rate 를 $ 5 \times 10^{-4} $ 에서 $ 5 \times 10^{-5} $ 으로 decay합니다. Iteration 횟수는 일반적으로 10만회에서 30만회 정도 수행합니다.
 

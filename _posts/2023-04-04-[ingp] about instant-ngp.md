@@ -324,9 +324,6 @@ $ N_{min} $과 $ N_{max} $가 주어졌으면 다음과 같이 $ l $번째 레�
 &#160;논문에서는 개선점으로 '해시 함수'를 주목합니다. Collision을 예방할 수 있는 더 정교한 해시 함수를 선택하는 것을 넘어, 해시 함수 또한 학습을 통해 최적화하는 아이디어를 제시하고 있습니다(Dictionary-learning approach). 또한, 본 논문의 핵심 아이디어인 multiresolution has encoding을 다른 작업(attention-based task 등)에 쓰일 수 있도록 확장하는 것도 목표로 하고 있습니다.
 
 
-
-
-
 ## Reference
 [그림2(1)](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/cuda) <br>
 [그림2(2)](https://www.gpumag.com/nvidia-cuda-cores/) <br>

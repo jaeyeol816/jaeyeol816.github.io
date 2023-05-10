@@ -450,7 +450,7 @@ $$ \gamma(p) = (sin(2^0 \pi p),\,cos(2^0 \pi p),\,sin(2^1 \pi p),\,cos(2^1 \pi p
 
 &#160;NeRF 포스팅을 마치겠습니다. 읽어주셔서 감사합니다.😀
 
-<br><br>
+<br>
 
 ## Reference
 [사진1](https://en.wikipedia.org/wiki/Mona_Lisa) <br>

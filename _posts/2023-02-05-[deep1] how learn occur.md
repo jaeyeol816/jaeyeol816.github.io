@@ -416,7 +416,6 @@ $$ w \leftarrow w - \alpha { ∂Loss \over ∂w } $$
 > 이상으로 이번 포스팅을 마치겠습니다. 끝까지 읽어주셔서 감사합니다^^
 
 
-<br><br><br>
 
 ## Reference
 [사진1(1)](http://news.heraldcorp.com/view.php?ud=20211103000987) <br>
